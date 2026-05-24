@@ -82,9 +82,33 @@ export default async function handler(req, res) {
             .limit(1)
             .get()
           if (!snap.empty) {
-            await snap.docs[0].ref.update({ plan })
+            // Also clears paymentFailed in case this is a retry success
+            await snap.docs[0].ref.update({ plan, paymentFailed: false })
             console.log(`Plan updated via portal: customer ${customerId} → ${plan}`)
           }
+        }
+        break
+      }
+
+      // Payment retry or renewal succeeded → restore plan + clear failed flag
+      case 'invoice.payment_succeeded': {
+        const invoice = event.data.object
+        // Skip the very first invoice — already handled by checkout.session.completed
+        if (invoice.billing_reason === 'subscription_create') break
+
+        const customerId = invoice.customer
+        const priceId = invoice.lines?.data?.[0]?.price?.id
+        const plan = PRICE_TO_PLAN[priceId]
+
+        const snap = await adminDb.collection('users')
+          .where('stripeCustomerId', '==', customerId)
+          .limit(1)
+          .get()
+        if (!snap.empty) {
+          const update = { paymentFailed: false }
+          if (plan) update.plan = plan // restore plan if we can map the price
+          await snap.docs[0].ref.update(update)
+          console.log(`Payment succeeded: cleared failed flag for customer ${customerId}`)
         }
         break
       }
