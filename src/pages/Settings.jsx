@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 const AVATAR_COLORS = [
@@ -45,6 +46,9 @@ export default function Settings() {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState('')
+  const [upgrading, setUpgrading] = useState(null)
+  const [searchParams] = useSearchParams()
+  const paymentSuccess = searchParams.get('payment') === 'success'
 
   const plan = userProfile?.plan ?? 'free'
   const displayName = userProfile?.displayName ?? user?.displayName ?? ''
@@ -79,6 +83,42 @@ export default function Settings() {
       setTimeout(() => setBioSuccess(false), 2000)
     } finally {
       setBioSaving(false)
+    }
+  }
+
+  async function handleUpgrade(planKey) {
+    setUpgrading(planKey)
+    try {
+      const idToken = await user.getIdToken()
+      const res = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: planKey, idToken }),
+      })
+      const data = await res.json()
+      if (data.url) { window.location.href = data.url; return }
+      throw new Error(data.error || 'Failed to create checkout session')
+    } catch (err) {
+      alert('Something went wrong. Please try again.')
+      setUpgrading(null)
+    }
+  }
+
+  async function handleManageSubscription() {
+    setUpgrading('manage')
+    try {
+      const idToken = await user.getIdToken()
+      const res = await fetch('/api/create-portal-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken }),
+      })
+      const data = await res.json()
+      if (data.url) { window.location.href = data.url; return }
+      throw new Error(data.error || 'Failed to open portal')
+    } catch (err) {
+      alert('Something went wrong. Please try again.')
+      setUpgrading(null)
     }
   }
 
@@ -178,6 +218,26 @@ export default function Settings() {
 
       {/* Subscription */}
       <Section title="Subscription">
+        {/* Payment success banner */}
+        {paymentSuccess && (
+          <div className="px-4 py-3 bg-green-600/20 border border-green-600/40 rounded-xl">
+            <p className="text-sm text-green-400 font-medium">
+              🎉 Payment successful! Your plan is being updated — refresh in a moment.
+            </p>
+          </div>
+        )}
+
+        {/* Manage subscription for paid users */}
+        {plan !== 'free' && (
+          <button
+            onClick={handleManageSubscription}
+            disabled={!!upgrading}
+            className="w-full py-2.5 rounded-xl border border-gray-700 text-sm text-gray-300 hover:text-white hover:border-gray-500 transition-colors disabled:opacity-50"
+          >
+            {upgrading === 'manage' ? 'Opening portal…' : 'Manage Subscription'}
+          </button>
+        )}
+
         <div className="space-y-2">
           {PLANS.map(p => {
             const isCurrent = p.key === plan
@@ -206,10 +266,11 @@ export default function Settings() {
                 </ul>
                 {!isCurrent && (
                   <button
-                    className="w-full py-1.5 rounded-lg text-xs font-semibold border border-accent text-accent hover:bg-accent/10 transition-colors"
-                    onClick={() => alert('Payment processing coming soon!')}
+                    onClick={() => handleUpgrade(p.key)}
+                    disabled={!!upgrading}
+                    className="w-full py-1.5 rounded-lg text-xs font-semibold border border-accent text-accent hover:bg-accent/10 transition-colors disabled:opacity-50"
                   >
-                    Upgrade to {p.label}
+                    {upgrading === p.key ? 'Redirecting to Stripe…' : `Upgrade to ${p.label}`}
                   </button>
                 )}
               </div>

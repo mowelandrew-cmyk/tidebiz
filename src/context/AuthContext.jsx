@@ -96,6 +96,7 @@ export function AuthProvider({ children }) {
   async function completeOnboarding(data) {
     if (!user) return
     const { displayName, ...rest } = data
+    // plan is intentionally excluded — stays 'free' until Stripe webhook upgrades it
     await Promise.allSettled([
       updateProfile(user, { displayName }),
       setDoc(doc(db, 'users', user.uid), {

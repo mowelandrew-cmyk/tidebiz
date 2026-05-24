@@ -94,14 +94,31 @@ export default function Onboarding() {
     completing.current = true
     setSaving(true)
     try {
+      // Always complete onboarding on free — Stripe webhook handles plan upgrade
       await completeOnboarding({
         displayName: name.trim(),
         bio: bio.trim(),
         avatarColor,
         businessType,
         mainGoal,
-        plan,
       })
+
+      // If they picked a paid plan, redirect to Stripe Checkout
+      if (plan !== 'free') {
+        const idToken = await user.getIdToken()
+        const res = await fetch('/api/create-checkout-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan, idToken }),
+        })
+        const data = await res.json()
+        if (data.url) {
+          window.location.href = data.url
+          return // browser will navigate away
+        }
+        // If Stripe fails, fall through to home on free plan
+      }
+
       setStep(4)
       setTimeout(() => navigate('/', { replace: true }), 1800)
     } catch (err) {
