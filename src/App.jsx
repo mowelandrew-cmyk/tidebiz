@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import BottomNav from './components/BottomNav'
 
+import Landing from './pages/Landing'
 import Login from './pages/auth/Login'
 import Signup from './pages/auth/Signup'
 import Onboarding from './pages/Onboarding'
@@ -29,23 +30,45 @@ export default function App() {
   return (
     <AuthProvider>
       <Routes>
+        {/* Always-public auth pages */}
         <Route path="/login"    element={<Login />} />
         <Route path="/signup"   element={<Signup />} />
         <Route
           path="/onboarding"
           element={<ProtectedRoute><Onboarding /></ProtectedRoute>}
         />
-        <Route
-          path="/*"
-          element={
-            <ProtectedRoute>
-              <AppShell />
-            </ProtectedRoute>
-          }
-        />
+        {/* Smart root: Landing for guests, AppShell for authenticated users */}
+        <Route path="/*" element={<RootOrApp />} />
       </Routes>
     </AuthProvider>
   )
+}
+
+/**
+ * Gate component — shows Landing for unauthenticated visitors,
+ * routes authenticated users into the full AppShell.
+ */
+function RootOrApp() {
+  const { user, loading } = useAuth()
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0e0e0c' }}>
+        <div
+          className="w-2 h-2 rounded-full"
+          style={{
+            background: '#4a6cf7',
+            boxShadow: '0 0 12px rgba(74,108,247,0.8)',
+            animation: 'pulse 1.4s ease-in-out infinite',
+          }}
+        />
+      </div>
+    )
+  }
+
+  if (!user) return <Landing />
+
+  return <AppShell />
 }
 
 function PageWrapper({ children }) {
