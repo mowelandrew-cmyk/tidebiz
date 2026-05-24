@@ -9,7 +9,7 @@ import {
   deleteUser,
 } from 'firebase/auth'
 import {
-  doc, setDoc, getDoc, updateDoc, deleteDoc,
+  doc, setDoc, getDoc, onSnapshot, updateDoc, deleteDoc,
   collection, getDocs, serverTimestamp,
 } from 'firebase/firestore'
 import { auth, db, googleProvider } from '../firebase/config'
@@ -22,21 +22,37 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
+    let unsubProfile = null
+
+    const unsubAuth = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser)
+
+      // Clean up any previous profile listener
+      if (unsubProfile) { unsubProfile(); unsubProfile = null }
+
       if (firebaseUser) {
-        try {
-          const snap = await getDoc(doc(db, 'users', firebaseUser.uid))
-          setUserProfile(snap.exists() ? snap.data() : null)
-        } catch {
-          setUserProfile(null)
-        }
+        // Real-time listener — picks up webhook plan updates automatically
+        unsubProfile = onSnapshot(
+          doc(db, 'users', firebaseUser.uid),
+          (snap) => {
+            setUserProfile(snap.exists() ? snap.data() : null)
+            setLoading(false)
+          },
+          () => {
+            setUserProfile(null)
+            setLoading(false)
+          }
+        )
       } else {
         setUserProfile(null)
+        setLoading(false)
       }
-      setLoading(false)
     })
-    return unsub
+
+    return () => {
+      unsubAuth()
+      if (unsubProfile) unsubProfile()
+    }
   }, [])
 
   async function signUp(email, password, displayName) {
