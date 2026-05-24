@@ -29,6 +29,9 @@ export function useJournalEntries() {
         : all.filter(e => now - (e.createdAt?.toMillis?.() ?? 0) <= THIRTY_DAYS)
       setEntries(filtered)
       setLoading(false)
+    }, err => {
+      console.error('useJournalEntries snapshot error:', err)
+      setLoading(false)
     })
     return unsub
   }, [user, isPro])

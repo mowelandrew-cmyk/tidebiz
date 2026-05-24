@@ -20,6 +20,9 @@ export function useReminders() {
     const unsub = onSnapshot(q, snap => {
       setReminders(snap.docs.map(d => ({ id: d.id, ...d.data() })))
       setLoading(false)
+    }, err => {
+      console.error('useReminders snapshot error:', err)
+      setLoading(false)
     })
     return unsub
   }, [user])

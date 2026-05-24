@@ -32,6 +32,9 @@ export function useEntries() {
           })
       setEntries(filtered)
       setLoading(false)
+    }, err => {
+      console.error('useEntries snapshot error:', err)
+      setLoading(false)
     })
     return unsub
   }, [user, isPro])
