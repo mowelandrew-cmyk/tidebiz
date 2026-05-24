@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useChat } from '../hooks/useChat'
+import { Briefcase, Send } from 'lucide-react'
 
 const MODEL_LABEL = { free: 'Gemini Flash', pro: 'Claude Haiku', max: 'Claude Sonnet' }
 
@@ -56,7 +57,9 @@ export default function Chat() {
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         {messages.length === 0 && !loading && (
           <div className="text-center py-16">
-            <p className="text-4xl mb-3">💼</p>
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(74,108,247,0.12)', border: '1px solid rgba(74,108,247,0.2)' }}>
+              <Briefcase className="w-7 h-7" style={{ color: '#4a6cf7' }} />
+            </div>
             <p className="text-white font-semibold text-sm mb-1">Your business mentor is ready</p>
             <p className="text-gray-500 text-xs max-w-[220px] mx-auto">
               Ask about your revenue, journal entries, upcoming reminders — anything.
@@ -115,9 +118,9 @@ export default function Chat() {
             <button
               onClick={handleSend}
               disabled={!input.trim() || loading || remaining === 0}
-              className="w-11 h-11 flex items-center justify-center rounded-xl bg-accent text-gray-900 disabled:opacity-40 shrink-0"
+              className="w-11 h-11 flex items-center justify-center rounded-xl bg-accent text-gray-900 disabled:opacity-40 shrink-0 cursor-pointer transition-opacity hover:opacity-90"
             >
-              <SendIcon />
+              <Send className="w-4 h-4" />
             </button>
           </div>
         )}
@@ -126,10 +129,3 @@ export default function Chat() {
   )
 }
 
-function SendIcon() {
-  return (
-    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-    </svg>
-  )
-}

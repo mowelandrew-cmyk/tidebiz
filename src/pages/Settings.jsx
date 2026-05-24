@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { AlertTriangle, CheckCircle2, Check } from 'lucide-react'
 
 const AVATAR_COLORS = [
   '#38bdf8', '#818cf8', '#a78bfa', '#f472b6',
@@ -220,13 +221,16 @@ export default function Settings() {
       <Section title="Subscription">
         {/* Payment failed banner */}
         {userProfile?.paymentFailed && plan === 'free' && (
-          <div className="px-4 py-3 bg-rose-600/20 border border-rose-600/40 rounded-xl">
-            <p className="text-sm text-rose-400 font-medium">⚠️ Your last payment failed — you've been moved to Free.</p>
-            <p className="text-xs text-rose-400/70 mt-0.5">Update your payment method to reactivate your plan.</p>
+          <div className="px-4 py-3 bg-rose-600/20 border border-rose-600/40 rounded-xl space-y-1">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+              <p className="text-sm text-rose-400 font-medium">Your last payment failed — you've been moved to Free.</p>
+            </div>
+            <p className="text-xs text-rose-400/70 pl-6">Update your payment method to reactivate your plan.</p>
             <button
               onClick={handleManageSubscription}
               disabled={!!upgrading}
-              className="mt-2 text-xs font-semibold text-rose-400 underline disabled:opacity-50"
+              className="mt-1 pl-6 text-xs font-semibold text-rose-400 underline disabled:opacity-50 cursor-pointer"
             >
               {upgrading === 'manage' ? 'Opening…' : 'Fix payment method →'}
             </button>
@@ -236,9 +240,12 @@ export default function Settings() {
         {/* Payment success banner */}
         {paymentSuccess && (
           <div className="px-4 py-3 bg-green-600/20 border border-green-600/40 rounded-xl">
-            <p className="text-sm text-green-400 font-medium">
-              🎉 Payment successful! Your plan is being updated — refresh in a moment.
-            </p>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-green-400 shrink-0" />
+              <p className="text-sm text-green-400 font-medium">
+                Payment successful! Your plan is being updated — refresh in a moment.
+              </p>
+            </div>
           </div>
         )}
 
@@ -275,7 +282,8 @@ export default function Settings() {
                 <ul className="space-y-0.5">
                   {p.features.map(f => (
                     <li key={f} className="text-xs text-gray-400 flex items-center gap-1.5">
-                      <span className="text-accent">✓</span> {f}
+                      <Check className="w-3 h-3 text-accent shrink-0" />
+                      {f}
                     </li>
                   ))}
                 </ul>

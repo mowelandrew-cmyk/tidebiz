@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import EntryEditor from '../../components/journal/EntryEditor'
+import { BookOpen } from 'lucide-react'
 
 function stripHtml(html) {
   return html?.replace(/<[^>]*>/g, '') ?? ''
@@ -91,7 +92,9 @@ export default function Entries({ entries, loading, addEntry, editEntry, removeE
       {/* Entry list */}
       {filtered.length === 0 && !writing && (
         <div className="text-center py-12">
-          <p className="text-4xl mb-3">📓</p>
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3" style={{ background: 'rgba(167,139,250,0.1)' }}>
+            <BookOpen className="w-6 h-6" style={{ color: '#a78bfa' }} />
+          </div>
           <p className="text-gray-400 text-sm">
             {search ? 'No entries match your search.' : 'No entries yet. Write your first one!'}
           </p>

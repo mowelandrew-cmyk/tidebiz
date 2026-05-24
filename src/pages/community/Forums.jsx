@@ -5,6 +5,7 @@ import {
   serverTimestamp, updateDoc, doc, increment, limit,
 } from 'firebase/firestore'
 import { db } from '../../firebase/config'
+import { ArrowLeft, MessageCircle, ChevronRight } from 'lucide-react'
 
 const CATEGORIES = [
   { id: 'general',   label: 'General Business',    emoji: '🏢', desc: 'Anything and everything about running a business' },
@@ -150,14 +151,14 @@ export default function Forums() {
         <button
           key={cat.id}
           onClick={() => openCategory(cat)}
-          className="card w-full text-left flex items-center gap-3 hover:border-gray-700 transition-colors active:scale-[0.99]"
+          className="card w-full text-left flex items-center gap-3 hover:border-gray-700 transition-colors active:scale-[0.99] cursor-pointer"
         >
-          <span className="text-2xl">{cat.emoji}</span>
+          <span className="text-xl w-8 text-center">{cat.emoji}</span>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-white">{cat.label}</p>
             <p className="text-xs text-gray-500 mt-0.5">{cat.desc}</p>
           </div>
-          <span className="text-gray-600 text-lg">›</span>
+          <ChevronRight className="w-4 h-4 text-gray-600 shrink-0" />
         </button>
       ))}
     </div>
@@ -167,8 +168,8 @@ export default function Forums() {
   if (view === 'threads') return (
     <div>
       {/* Sub-header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 bg-gray-900 sticky top-12 z-10">
-        <button onClick={goBack} className="text-gray-400 hover:text-white text-xl leading-none">←</button>
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 sticky top-12 z-10" style={{ background: '#0f1117' }}>
+        <button onClick={goBack} className="text-gray-400 hover:text-white transition-colors cursor-pointer"><ArrowLeft className="w-5 h-5" /></button>
         <span className="text-sm font-semibold text-white flex-1">{category.emoji} {category.label}</span>
         <button onClick={() => setShowNewThread(v => !v)} className="text-xs text-accent font-semibold">
           {showNewThread ? 'Cancel' : '+ New'}
@@ -225,7 +226,7 @@ export default function Forums() {
                   <span className="text-xs text-gray-500">{t.displayName}</span>
                   <span className="text-gray-700">·</span>
                   <span className="text-xs text-gray-500">{timeAgo(t.createdAt)}</span>
-                  <span className="text-xs text-gray-500 ml-auto">💬 {t.replyCount || 0}</span>
+                  <span className="flex items-center gap-1 text-xs text-gray-500 ml-auto"><MessageCircle className="w-3 h-3" />{t.replyCount || 0}</span>
                 </div>
               </div>
             </div>
@@ -239,8 +240,8 @@ export default function Forums() {
   return (
     <div>
       {/* Sub-header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 bg-gray-900 sticky top-12 z-10">
-        <button onClick={goBack} className="text-gray-400 hover:text-white text-xl leading-none">←</button>
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 sticky top-12 z-10" style={{ background: '#0f1117' }}>
+        <button onClick={goBack} className="text-gray-400 hover:text-white transition-colors cursor-pointer"><ArrowLeft className="w-5 h-5" /></button>
         <span className="text-sm font-semibold text-white line-clamp-1 flex-1">{thread.title}</span>
       </div>
 

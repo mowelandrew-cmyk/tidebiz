@@ -15,7 +15,7 @@ export default function Community() {
   return (
     <div className="flex flex-col min-h-full">
       {/* Sticky tab bar */}
-      <div className="sticky top-0 z-10 flex border-b border-gray-800 bg-gray-900 shrink-0">
+      <div className="sticky top-0 z-10 flex border-b border-gray-800 shrink-0" style={{ background: '#0f1117' }}>
         {TABS.map(t => (
           <button
             key={t.key}

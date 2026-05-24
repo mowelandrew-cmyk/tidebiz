@@ -5,6 +5,7 @@ import {
   addDoc, serverTimestamp, updateDoc, doc, arrayUnion, arrayRemove, increment,
 } from 'firebase/firestore'
 import { db } from '../../firebase/config'
+import { Heart, MessageCircle, Bookmark, Feather } from 'lucide-react'
 
 const COLORS = ['#38bdf8', '#818cf8', '#a78bfa', '#f472b6', '#fb923c', '#34d399', '#facc15', '#f87171']
 
@@ -153,7 +154,9 @@ export default function Feed() {
       {/* Empty state */}
       {posts.length === 0 && (
         <div className="text-center py-14">
-          <p className="text-3xl mb-2">🌊</p>
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3" style={{ background: 'rgba(74,108,247,0.1)' }}>
+            <Feather className="w-6 h-6" style={{ color: '#4a6cf7' }} />
+          </div>
           <p className="text-sm text-gray-500">No posts yet. Be the first to share!</p>
         </div>
       )}
@@ -183,23 +186,23 @@ export default function Feed() {
             <div className="flex items-center gap-5 pt-1 border-t border-gray-800">
               <button
                 onClick={() => toggleLike(p)}
-                className={`flex items-center gap-1.5 text-xs transition-colors ${liked ? 'text-rose-400' : 'text-gray-500 hover:text-rose-400'}`}
+                className={`flex items-center gap-1.5 text-xs transition-colors cursor-pointer ${liked ? 'text-rose-400' : 'text-gray-500 hover:text-rose-400'}`}
               >
-                <span className="text-base leading-none">{liked ? '♥' : '♡'}</span>
+                <Heart className={`w-3.5 h-3.5 ${liked ? 'fill-rose-400' : ''}`} />
                 <span>{p.likes?.length || 0}</span>
               </button>
               <button
                 onClick={() => toggleComments(p.id)}
-                className={`flex items-center gap-1.5 text-xs transition-colors ${open ? 'text-accent' : 'text-gray-500 hover:text-gray-300'}`}
+                className={`flex items-center gap-1.5 text-xs transition-colors cursor-pointer ${open ? 'text-accent' : 'text-gray-500 hover:text-gray-300'}`}
               >
-                <span>💬</span>
+                <MessageCircle className="w-3.5 h-3.5" />
                 <span>{p.commentCount || 0}</span>
               </button>
               <button
                 onClick={() => toggleSave(p)}
-                className={`flex items-center gap-1.5 text-xs transition-colors ml-auto ${saved ? 'text-accent' : 'text-gray-500 hover:text-accent'}`}
+                className={`flex items-center gap-1.5 text-xs transition-colors ml-auto cursor-pointer ${saved ? 'text-accent' : 'text-gray-500 hover:text-accent'}`}
               >
-                <span>🔖</span>
+                <Bookmark className={`w-3.5 h-3.5 ${saved ? 'fill-accent' : ''}`} />
                 <span>{saved ? 'Saved' : 'Save'}</span>
               </button>
             </div>
