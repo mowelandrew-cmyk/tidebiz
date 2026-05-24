@@ -39,8 +39,10 @@ export default function Charts({ entries, viewingCurrency, convert, ratesLoading
 
   if (ratesLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+      <div className="px-4 py-4 space-y-3">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="skeleton h-16 rounded-xl" />
+        ))}
       </div>
     )
   }
@@ -48,8 +50,15 @@ export default function Charts({ entries, viewingCurrency, convert, ratesLoading
   if (data.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center px-6">
-        <p className="text-4xl mb-3">📊</p>
-        <p className="text-gray-400 text-sm">Add some entries in the Ledger tab to see your charts.</p>
+        <div
+          className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3"
+          style={{ background: 'rgba(74,108,247,0.08)', border: '1px solid rgba(74,108,247,0.15)' }}
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="#4a6cf7" strokeWidth={1.8}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+          </svg>
+        </div>
+        <p className="text-sm" style={{ color: '#57534e' }}>Add some entries in the Ledger tab to see your charts.</p>
       </div>
     )
   }
@@ -60,52 +69,69 @@ export default function Charts({ entries, viewingCurrency, convert, ratesLoading
   }
 
   const tooltipStyle = {
-    backgroundColor: '#1f2937',
-    border: '1px solid #374151',
+    backgroundColor: '#1d1d1a',
+    border: '1px solid rgba(255,255,255,0.08)',
     borderRadius: 8,
-    color: '#f9fafb',
+    color: '#f0ede6',
+    fontSize: 12,
   }
 
   return (
     <div className="px-4 py-4 space-y-4">
       {/* Chart type toggle */}
-      <div className="flex rounded-xl overflow-hidden border border-gray-700 w-fit">
+      <div
+        className="flex p-0.5 rounded-lg w-fit"
+        style={{ background: '#161613', border: '1px solid rgba(255,255,255,0.05)' }}
+      >
         {CHART_TYPES.map(t => (
-          <button key={t.id} onClick={() => setChartType(t.id)}
-            className={`px-4 py-1.5 text-sm font-medium transition-colors ${
-              chartType === t.id ? 'bg-accent text-gray-900' : 'text-gray-400 hover:text-gray-200'
-            }`}>
+          <button
+            key={t.id}
+            onClick={() => setChartType(t.id)}
+            className="px-4 py-1.5 rounded-md text-sm font-medium cursor-pointer transition-all duration-100"
+            style={{
+              color: chartType === t.id ? '#f0ede6' : '#57534e',
+              background: chartType === t.id ? '#1d1d1a' : 'transparent',
+              boxShadow: chartType === t.id ? '0 1px 4px rgba(0,0,0,0.4)' : 'none',
+            }}
+          >
             {t.label}
           </button>
         ))}
       </div>
 
-      <div className="card">
-        <p className="text-xs text-gray-500 uppercase tracking-widest mb-4">
+      <div
+        className="rounded-xl p-4"
+        style={{
+          background: '#1d1d1a',
+          border: '1px solid rgba(255,255,255,0.06)',
+          boxShadow: '0 1px 1px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.035)',
+        }}
+      >
+        <p className="section-label mb-4">
           Revenue · Expenses · Profit — {viewingCurrency}
         </p>
         <ResponsiveContainer width="100%" height={260}>
           {chartType === 'line' ? (
             <LineChart {...commonProps}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-              <XAxis dataKey="month" tickFormatter={tickFmt} tick={{ fill: '#6b7280', fontSize: 11 }} />
-              <YAxis tickFormatter={v => fmt(v)} tick={{ fill: '#6b7280', fontSize: 10 }} width={72} />
-              <Tooltip formatter={(v, name) => [fmt(v), name]} contentStyle={tooltipStyle} />
-              <Legend wrapperStyle={{ fontSize: 12, color: '#9ca3af' }} />
-              <Line type="monotone" dataKey="revenue" stroke="#34d399" strokeWidth={2} dot={false} name="Revenue" />
-              <Line type="monotone" dataKey="expenses" stroke="#fb7185" strokeWidth={2} dot={false} name="Expenses" />
-              <Line type="monotone" dataKey="profit" stroke="#38bdf8" strokeWidth={2} dot={false} name="Profit" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+              <XAxis dataKey="month" tickFormatter={tickFmt} tick={{ fill: '#57534e', fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tickFormatter={v => fmt(v)} tick={{ fill: '#57534e', fontSize: 10 }} width={72} axisLine={false} tickLine={false} />
+              <Tooltip formatter={(v, name) => [fmt(v), name]} contentStyle={tooltipStyle} cursor={{ stroke: 'rgba(255,255,255,0.06)' }} />
+              <Legend wrapperStyle={{ fontSize: 12, color: '#57534e' }} />
+              <Line type="monotone" dataKey="revenue" stroke="#22c55e" strokeWidth={2} dot={false} name="Revenue" />
+              <Line type="monotone" dataKey="expenses" stroke="#f43f5e" strokeWidth={2} dot={false} name="Expenses" />
+              <Line type="monotone" dataKey="profit" stroke="#4a6cf7" strokeWidth={2} dot={false} name="Profit" />
             </LineChart>
           ) : (
             <BarChart {...commonProps}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-              <XAxis dataKey="month" tickFormatter={tickFmt} tick={{ fill: '#6b7280', fontSize: 11 }} />
-              <YAxis tickFormatter={v => fmt(v)} tick={{ fill: '#6b7280', fontSize: 10 }} width={72} />
-              <Tooltip formatter={(v, name) => [fmt(v), name]} contentStyle={tooltipStyle} />
-              <Legend wrapperStyle={{ fontSize: 12, color: '#9ca3af' }} />
-              <Bar dataKey="revenue"  fill="#34d399" name="Revenue"  radius={[4, 4, 0, 0]} />
-              <Bar dataKey="expenses" fill="#fb7185" name="Expenses" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="profit"   fill="#38bdf8" name="Profit"   radius={[4, 4, 0, 0]} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+              <XAxis dataKey="month" tickFormatter={tickFmt} tick={{ fill: '#57534e', fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tickFormatter={v => fmt(v)} tick={{ fill: '#57534e', fontSize: 10 }} width={72} axisLine={false} tickLine={false} />
+              <Tooltip formatter={(v, name) => [fmt(v), name]} contentStyle={tooltipStyle} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+              <Legend wrapperStyle={{ fontSize: 12, color: '#57534e' }} />
+              <Bar dataKey="revenue"  fill="#22c55e" name="Revenue"  radius={[4, 4, 0, 0]} />
+              <Bar dataKey="expenses" fill="#f43f5e" name="Expenses" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="profit"   fill="#4a6cf7" name="Profit"   radius={[4, 4, 0, 0]} />
             </BarChart>
           )}
         </ResponsiveContainer>

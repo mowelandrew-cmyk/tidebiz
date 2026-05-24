@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { X, Trash2 } from 'lucide-react'
 
 export default function ReminderModal({ date, reminder, onSave, onDelete, onClose }) {
   const editing = !!reminder
@@ -30,59 +32,122 @@ export default function ReminderModal({ date, reminder, onSave, onDelete, onClos
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm px-4 pb-4 sm:pb-0"
-         onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="w-full max-w-md bg-surface-raised rounded-2xl border border-gray-800 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-800 flex items-center justify-between">
+    <motion.div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center px-4 pb-4 sm:pb-0"
+      style={{ background: 'rgba(0,0,0,0.7)' }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.18 }}
+      onClick={e => e.target === e.currentTarget && onClose()}
+    >
+      <motion.div
+        className="w-full max-w-md overflow-hidden"
+        style={{
+          background: '#1d1d1a',
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: '16px',
+          boxShadow: '0 24px 80px rgba(0,0,0,0.7)',
+        }}
+        initial={{ opacity: 0, y: 24, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 16, scale: 0.97 }}
+        transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+      >
+        {/* Header */}
+        <div
+          className="px-6 py-4 flex items-center justify-between"
+          style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+        >
           <div>
-            <p className="text-xs text-accent uppercase tracking-widest mb-0.5">Reminder</p>
-            <p className="text-white font-semibold">{displayDate}</p>
+            <p
+              className="text-[10px] font-semibold uppercase mb-0.5"
+              style={{ color: '#4a6cf7', letterSpacing: '0.08em' }}
+            >
+              Reminder
+            </p>
+            <p className="font-semibold" style={{ color: '#f0ede6' }}>{displayDate}</p>
           </div>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-300">
-            <XIcon />
-          </button>
+          <motion.button
+            onClick={onClose}
+            className="w-7 h-7 flex items-center justify-center rounded-lg cursor-pointer"
+            style={{ color: '#57534e' }}
+            whileHover={{ color: '#f0ede6', background: 'rgba(255,255,255,0.06)' }}
+            whileTap={{ scale: 0.9 }}
+            transition={{ duration: 0.1 }}
+          >
+            <X className="w-4 h-4" />
+          </motion.button>
         </div>
 
         <div className="px-6 py-5 space-y-4">
-          <div>
-            <label className="block text-sm text-gray-400 mb-1">Title</label>
-            <input className="input-field" placeholder="e.g. Follow up with client"
-              value={title} onChange={e => setTitle(e.target.value)} />
+          <div className="space-y-1.5">
+            <label className="section-label">Title</label>
+            <input
+              className="input-field"
+              placeholder="e.g. Follow up with client"
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+            />
           </div>
-          <div>
-            <label className="block text-sm text-gray-400 mb-1">Note <span className="text-gray-600">(optional)</span></label>
-            <textarea className="input-field resize-none" rows={2} placeholder="Add details..."
-              value={note} onChange={e => setNote(e.target.value)} />
+          <div className="space-y-1.5">
+            <label className="section-label">
+              Note <span style={{ color: '#3d3a35' }}>(optional)</span>
+            </label>
+            <textarea
+              className="input-field resize-none"
+              rows={2}
+              placeholder="Add details…"
+              value={note}
+              onChange={e => setNote(e.target.value)}
+            />
           </div>
-          <div>
-            <label className="block text-sm text-gray-400 mb-1">Time <span className="text-gray-600">(optional)</span></label>
-            <input type="time" className="input-field" value={time} onChange={e => setTime(e.target.value)} />
+          <div className="space-y-1.5">
+            <label className="section-label">
+              Time <span style={{ color: '#3d3a35' }}>(optional)</span>
+            </label>
+            <input
+              type="time"
+              className="input-field"
+              value={time}
+              onChange={e => setTime(e.target.value)}
+            />
           </div>
 
-          {error && <p className="text-red-400 text-sm">{error}</p>}
+          {error && <p className="text-sm" style={{ color: '#f43f5e' }}>{error}</p>}
 
           <div className="flex gap-3 pt-1">
             {editing && (
-              <button onClick={handleDelete}
-                className="flex-1 py-2.5 rounded-xl bg-rose-600/20 text-rose-400 border border-rose-600/30 text-sm font-medium hover:bg-rose-600/30 transition-colors">
+              <motion.button
+                onClick={handleDelete}
+                className="flex-1 py-2.5 rounded-xl text-sm font-medium cursor-pointer flex items-center justify-center gap-2"
+                style={{
+                  background: 'rgba(244,63,94,0.08)',
+                  border: '1px solid rgba(244,63,94,0.2)',
+                  color: '#f43f5e',
+                }}
+                whileHover={{ background: 'rgba(244,63,94,0.14)' }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ duration: 0.1 }}
+              >
+                <Trash2 className="w-3.5 h-3.5" />
                 Delete
-              </button>
+              </motion.button>
             )}
-            <button onClick={handleSave} disabled={saving}
-              className="flex-1 btn-primary !w-auto py-2.5 text-sm">
+            <motion.button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex-1 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50 cursor-pointer"
+              style={{ background: 'linear-gradient(135deg, #4a6cf7 0%, #3655e5 100%)', color: '#fff' }}
+              whileHover={{ opacity: 0.92 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.1 }}
+            >
               {saving ? 'Saving…' : editing ? 'Save Changes' : 'Add Reminder'}
-            </button>
+            </motion.button>
           </div>
         </div>
-      </div>
-    </div>
-  )
-}
-
-function XIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-    </svg>
+      </motion.div>
+    </motion.div>
   )
 }

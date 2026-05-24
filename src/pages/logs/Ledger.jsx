@@ -1,7 +1,18 @@
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import { formatAmount } from '../../lib/currencies'
+import { Plus } from 'lucide-react'
 import AddEntryModal from '../../components/logs/AddEntryModal'
 import EntryDetailModal from '../../components/logs/EntryDetailModal'
+
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.05, delayChildren: 0.04 } },
+}
+const item = {
+  hidden: { opacity: 0, y: 8 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.28, ease: [0.16, 1, 0.3, 1] } },
+}
 
 export default function Ledger({ entries, addEntry, editEntry, removeEntry, viewingCurrency, convert, ratesLoading }) {
   const [showAdd, setShowAdd] = useState(false)
@@ -16,10 +27,7 @@ export default function Ledger({ entries, addEntry, editEntry, removeEntry, view
   const totalExpense = expenses.reduce((s, e) => s + convert(e.amount, e.currency), 0)
   const profit = totalRevenue - totalExpense
 
-  function openAdd(type) {
-    setAddType(type)
-    setShowAdd(true)
-  }
+  function openAdd(type) { setAddType(type); setShowAdd(true) }
 
   async function handleSave(data) {
     if (editing) {
@@ -36,43 +44,82 @@ export default function Ledger({ entries, addEntry, editEntry, removeEntry, view
   }
 
   return (
-    <div className="flex flex-col gap-4 px-4 py-4">
+    <motion.div
+      className="flex flex-col gap-4 px-4 py-4"
+      variants={container}
+      initial="hidden"
+      animate="show"
+    >
       {/* Profit summary */}
-      <div className="card flex items-center justify-between">
-        <div>
-          <p className="text-xs text-gray-500 uppercase tracking-widest mb-0.5">Net Profit</p>
-          <p className={`text-2xl font-bold ${profit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-            {ratesLoading ? '—' : formatAmount(profit, viewingCurrency)}
-          </p>
+      <motion.div
+        variants={item}
+        className="rounded-xl px-4 py-4"
+        style={{
+          background: '#1d1d1a',
+          border: '1px solid rgba(255,255,255,0.06)',
+          boxShadow: '0 1px 1px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.035)',
+        }}
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="section-label mb-1">Net Profit</p>
+            <p
+              className="text-2xl font-bold tabular-nums"
+              style={{
+                color: profit >= 0 ? '#22c55e' : '#f43f5e',
+                letterSpacing: '-0.03em',
+              }}
+            >
+              {ratesLoading ? '—' : formatAmount(profit, viewingCurrency)}
+            </p>
+          </div>
+          <div className="text-right space-y-1.5">
+            <div className="flex items-center justify-end gap-1.5">
+              <span className="text-xs tabular-nums" style={{ color: '#22c55e' }}>
+                {ratesLoading ? '—' : formatAmount(totalRevenue, viewingCurrency)}
+              </span>
+              <span className="text-[10px] font-semibold px-1 rounded" style={{ background: 'rgba(34,197,94,0.1)', color: '#22c55e' }}>IN</span>
+            </div>
+            <div className="flex items-center justify-end gap-1.5">
+              <span className="text-xs tabular-nums" style={{ color: '#f43f5e' }}>
+                {ratesLoading ? '—' : formatAmount(totalExpense, viewingCurrency)}
+              </span>
+              <span className="text-[10px] font-semibold px-1 rounded" style={{ background: 'rgba(244,63,94,0.1)', color: '#f43f5e' }}>OUT</span>
+            </div>
+          </div>
         </div>
-        <div className="text-right space-y-1">
-          <p className="text-xs text-emerald-400">↑ {ratesLoading ? '—' : formatAmount(totalRevenue, viewingCurrency)}</p>
-          <p className="text-xs text-rose-400">↓ {ratesLoading ? '—' : formatAmount(totalExpense, viewingCurrency)}</p>
-        </div>
-      </div>
+      </motion.div>
 
       {/* T-chart */}
-      <div className="grid grid-cols-2 gap-3">
+      <motion.div variants={item} className="grid grid-cols-2 gap-3">
         {/* Revenue column */}
         <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-semibold text-emerald-400 uppercase tracking-widest">Revenue</h3>
-            <button onClick={() => openAdd('revenue')}
-              className="w-6 h-6 rounded-full bg-emerald-600/20 text-emerald-400 flex items-center justify-center hover:bg-emerald-600/40 transition-colors">
-              <PlusIcon />
-            </button>
+          <div className="flex items-center justify-between mb-0.5">
+            <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#22c55e', letterSpacing: '0.08em' }}>
+              Revenue
+            </p>
+            <motion.button
+              onClick={() => openAdd('revenue')}
+              className="w-6 h-6 rounded-lg flex items-center justify-center cursor-pointer"
+              style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.2)' }}
+              whileHover={{ scale: 1.12 }}
+              whileTap={{ scale: 0.88 }}
+              transition={{ duration: 0.1 }}
+            >
+              <Plus className="w-3.5 h-3.5" style={{ color: '#22c55e' }} />
+            </motion.button>
           </div>
           {revenues.length === 0 && (
-            <p className="text-gray-600 text-xs text-center py-4">No revenue yet</p>
+            <p className="text-xs text-center py-4" style={{ color: '#3d3a35' }}>No revenue yet</p>
           )}
           {revenues.map(e => (
             <EntryCard key={e.id} entry={e} viewingCurrency={viewingCurrency}
               convert={convert} ratesLoading={ratesLoading}
-              onClick={() => setSelected(e)} color="emerald" />
+              onClick={() => setSelected(e)} accent="#22c55e" accentBg="rgba(34,197,94,0.08)" />
           ))}
           {revenues.length > 0 && (
-            <div className="border-t border-gray-700 pt-2 text-right">
-              <p className="text-xs text-emerald-400 font-semibold">
+            <div className="pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              <p className="text-xs text-right font-semibold tabular-nums" style={{ color: '#22c55e' }}>
                 {ratesLoading ? '—' : formatAmount(totalRevenue, viewingCurrency)}
               </p>
             </div>
@@ -81,32 +128,40 @@ export default function Ledger({ entries, addEntry, editEntry, removeEntry, view
 
         {/* Expense column */}
         <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-semibold text-rose-400 uppercase tracking-widest">Expenses</h3>
-            <button onClick={() => openAdd('expense')}
-              className="w-6 h-6 rounded-full bg-rose-600/20 text-rose-400 flex items-center justify-center hover:bg-rose-600/40 transition-colors">
-              <PlusIcon />
-            </button>
+          <div className="flex items-center justify-between mb-0.5">
+            <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#f43f5e', letterSpacing: '0.08em' }}>
+              Expenses
+            </p>
+            <motion.button
+              onClick={() => openAdd('expense')}
+              className="w-6 h-6 rounded-lg flex items-center justify-center cursor-pointer"
+              style={{ background: 'rgba(244,63,94,0.1)', border: '1px solid rgba(244,63,94,0.2)' }}
+              whileHover={{ scale: 1.12 }}
+              whileTap={{ scale: 0.88 }}
+              transition={{ duration: 0.1 }}
+            >
+              <Plus className="w-3.5 h-3.5" style={{ color: '#f43f5e' }} />
+            </motion.button>
           </div>
           {expenses.length === 0 && (
-            <p className="text-gray-600 text-xs text-center py-4">No expenses yet</p>
+            <p className="text-xs text-center py-4" style={{ color: '#3d3a35' }}>No expenses yet</p>
           )}
           {expenses.map(e => (
             <EntryCard key={e.id} entry={e} viewingCurrency={viewingCurrency}
               convert={convert} ratesLoading={ratesLoading}
-              onClick={() => setSelected(e)} color="rose" />
+              onClick={() => setSelected(e)} accent="#f43f5e" accentBg="rgba(244,63,94,0.06)" />
           ))}
           {expenses.length > 0 && (
-            <div className="border-t border-gray-700 pt-2 text-right">
-              <p className="text-xs text-rose-400 font-semibold">
+            <div className="pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              <p className="text-xs text-right font-semibold tabular-nums" style={{ color: '#f43f5e' }}>
                 {ratesLoading ? '—' : formatAmount(totalExpense, viewingCurrency)}
               </p>
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
 
-      {/* Add entry modal */}
+      {/* Modals */}
       {(showAdd || editing) && (
         <AddEntryModal
           initial={editing ? { ...editing, type: addType } : { type: addType }}
@@ -115,7 +170,6 @@ export default function Ledger({ entries, addEntry, editEntry, removeEntry, view
         />
       )}
 
-      {/* Entry detail modal */}
       {selected && !editing && (
         <EntryDetailModal
           entry={selected}
@@ -126,37 +180,43 @@ export default function Ledger({ entries, addEntry, editEntry, removeEntry, view
           onDelete={() => handleDelete(selected.id)}
         />
       )}
-    </div>
+    </motion.div>
   )
 }
 
-function EntryCard({ entry, viewingCurrency, convert, ratesLoading, onClick, color }) {
+function EntryCard({ entry, viewingCurrency, convert, ratesLoading, onClick, accent, accentBg }) {
   const converted = convert(entry.amount, entry.currency)
   const date = entry.createdAt?.toDate?.()
 
   return (
-    <button onClick={onClick}
-      className={`w-full text-left card hover:border-${color}-600/40 active:scale-[0.98] transition-all duration-150 space-y-1`}>
-      <p className="text-white text-xs font-medium truncate">{entry.title}</p>
-      <p className={`text-sm font-bold text-${color}-400`}>
+    <motion.button
+      onClick={onClick}
+      className="w-full text-left rounded-xl px-3 py-2.5 space-y-0.5 cursor-pointer"
+      style={{
+        background: '#1d1d1a',
+        border: '1px solid rgba(255,255,255,0.06)',
+      }}
+      whileHover={{
+        background: accentBg,
+        borderColor: `${accent}30`,
+      }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ duration: 0.12, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <p className="text-xs font-medium truncate" style={{ color: '#f0ede6' }}>{entry.title}</p>
+      <p className="text-sm font-bold tabular-nums" style={{ color: accent }}>
         {ratesLoading ? '—' : formatAmount(converted, viewingCurrency)}
       </p>
       {entry.currency !== viewingCurrency && (
-        <p className="text-gray-600 text-[10px]">{formatAmount(entry.amount, entry.currency)} {entry.currency}</p>
+        <p className="text-[10px]" style={{ color: '#3d3a35' }}>
+          {formatAmount(entry.amount, entry.currency)} {entry.currency}
+        </p>
       )}
       {date && (
-        <p className="text-gray-600 text-[10px]">
+        <p className="text-[10px]" style={{ color: '#3d3a35' }}>
           {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
         </p>
       )}
-    </button>
-  )
-}
-
-function PlusIcon() {
-  return (
-    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-    </svg>
+    </motion.button>
   )
 }

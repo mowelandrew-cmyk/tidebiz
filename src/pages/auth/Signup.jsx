@@ -1,6 +1,16 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { useAuth } from '../../context/AuthContext'
+
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.065, delayChildren: 0.1 } },
+}
+const item = {
+  hidden: { opacity: 0, y: 12 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.38, ease: [0.16, 1, 0.3, 1] } },
+}
 
 export default function Signup() {
   const { signUp, logInWithGoogle } = useAuth()
@@ -43,85 +53,95 @@ export default function Signup() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-surface">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-white">TideBiz</h1>
-          <p className="text-gray-400 mt-1 text-sm">Join thousands of young entrepreneurs</p>
-        </div>
+    <div className="min-h-screen flex flex-col items-center justify-center px-6" style={{ background: '#0e0e0c' }}>
+      <motion.div
+        className="w-full max-w-sm"
+        variants={container}
+        initial="hidden"
+        animate="show"
+      >
+        {/* Logo */}
+        <motion.div variants={item} className="mb-10 text-center">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg, #4a6cf7 0%, #3655e5 100%)' }}
+            >
+              <span className="text-white font-bold text-sm">T</span>
+            </div>
+            <span className="font-bold text-xl" style={{ color: '#f0ede6', letterSpacing: '-0.03em' }}>
+              TideBiz
+            </span>
+          </div>
+          <p className="text-sm" style={{ color: '#57534e' }}>Join thousands of young entrepreneurs</p>
+        </motion.div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm text-gray-400 mb-1">Name</label>
-            <input
-              type="text"
-              className="input-field"
-              placeholder="Your name"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm text-gray-400 mb-1">Email</label>
-            <input
-              type="email"
-              className="input-field"
-              placeholder="you@example.com"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm text-gray-400 mb-1">Password</label>
-            <input
-              type="password"
-              className="input-field"
-              placeholder="Min. 6 characters"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm text-gray-400 mb-1">Confirm Password</label>
-            <input
-              type="password"
-              className="input-field"
-              placeholder="••••••••"
-              value={confirm}
-              onChange={e => setConfirm(e.target.value)}
-              required
-            />
-          </div>
+          <motion.div variants={item} className="space-y-1.5">
+            <label className="section-label">Name</label>
+            <input type="text" className="input-field" placeholder="Your name"
+              value={name} onChange={e => setName(e.target.value)} required />
+          </motion.div>
+          <motion.div variants={item} className="space-y-1.5">
+            <label className="section-label">Email</label>
+            <input type="email" className="input-field" placeholder="you@example.com"
+              value={email} onChange={e => setEmail(e.target.value)} required />
+          </motion.div>
+          <motion.div variants={item} className="space-y-1.5">
+            <label className="section-label">Password</label>
+            <input type="password" className="input-field" placeholder="Min. 6 characters"
+              value={password} onChange={e => setPassword(e.target.value)} required />
+          </motion.div>
+          <motion.div variants={item} className="space-y-1.5">
+            <label className="section-label">Confirm Password</label>
+            <input type="password" className="input-field" placeholder="••••••••"
+              value={confirm} onChange={e => setConfirm(e.target.value)} required />
+          </motion.div>
 
-          {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+          {error && (
+            <motion.p
+              className="text-sm text-center"
+              style={{ color: '#f43f5e' }}
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              {error}
+            </motion.p>
+          )}
 
-          <button type="submit" className="btn-primary" disabled={loading}>
-            {loading ? 'Creating account…' : 'Create Account'}
-          </button>
+          <motion.div variants={item}>
+            <button type="submit" className="btn-primary" disabled={loading}>
+              {loading ? 'Creating account…' : 'Create Account'}
+            </button>
+          </motion.div>
         </form>
 
-        <div className="relative my-5">
+        <motion.div variants={item} className="relative my-6">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-700" />
+            <div className="w-full" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }} />
           </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="bg-surface px-3 text-gray-500">or</span>
+          <div className="relative flex justify-center">
+            <span className="px-3 text-xs" style={{ background: '#0e0e0c', color: '#3d3a35' }}>or</span>
           </div>
-        </div>
+        </motion.div>
 
-        <button onClick={handleGoogle} className="btn-secondary flex items-center justify-center gap-3" disabled={loading}>
-          <GoogleIcon />
-          Continue with Google
-        </button>
+        <motion.div variants={item}>
+          <button
+            onClick={handleGoogle}
+            className="btn-secondary flex items-center justify-center gap-3"
+            disabled={loading}
+          >
+            <GoogleIcon />
+            Continue with Google
+          </button>
+        </motion.div>
 
-        <p className="text-center text-gray-500 text-sm mt-6">
+        <motion.p variants={item} className="text-center text-sm mt-6" style={{ color: '#57534e' }}>
           Already have an account?{' '}
-          <Link to="/login" className="text-accent hover:underline">Sign in</Link>
-        </p>
-      </div>
+          <Link to="/login" className="hover:underline" style={{ color: '#4a6cf7' }}>Sign in</Link>
+        </motion.p>
+      </motion.div>
     </div>
   )
 }
@@ -139,11 +159,8 @@ function GoogleIcon() {
 
 function friendlyError(code) {
   switch (code) {
-    case 'auth/email-already-in-use':
-      return 'An account with this email already exists.'
-    case 'auth/invalid-email':
-      return 'Please enter a valid email.'
-    default:
-      return 'Something went wrong. Please try again.'
+    case 'auth/email-already-in-use': return 'An account with this email already exists.'
+    case 'auth/invalid-email': return 'Please enter a valid email.'
+    default: return 'Something went wrong. Please try again.'
   }
 }

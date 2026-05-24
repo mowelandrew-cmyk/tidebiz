@@ -1,20 +1,27 @@
 import { useState, useEffect, useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../../context/AuthContext'
 import {
   collection, query, onSnapshot, addDoc, serverTimestamp,
   doc, setDoc, getDoc, orderBy, limit,
 } from 'firebase/firestore'
 import { db } from '../../firebase/config'
-import { ArrowLeft, Send, Users, MessageSquare, Zap, Star } from 'lucide-react'
+import { ArrowLeft, Send, Users, MessageSquare, Zap, Star, Search } from 'lucide-react'
 
 const COLORS = ['#38bdf8', '#818cf8', '#a78bfa', '#f472b6', '#fb923c', '#34d399', '#facc15', '#f87171']
+
+const CARD = {
+  background: '#1d1d1a',
+  border: '1px solid rgba(255,255,255,0.06)',
+  boxShadow: '0 1px 1px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.035)',
+}
 
 function Avatar({ name, color, size = 40 }) {
   const initials = (name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
   return (
     <div
-      className="rounded-full flex items-center justify-center font-bold text-gray-900 shrink-0"
-      style={{ width: size, height: size, backgroundColor: color || COLORS[0], fontSize: size <= 28 ? 10 : 13 }}
+      className="rounded-full flex items-center justify-center font-bold shrink-0"
+      style={{ width: size, height: size, backgroundColor: color || COLORS[0], color: '#0e0e0c', fontSize: size <= 28 ? 10 : 13 }}
     >
       {initials}
     </div>
@@ -83,7 +90,6 @@ export default function Directory() {
 
     const dmId = getDmId(user.uid, otherUser.id)
     const dmRef = doc(db, 'dms', dmId)
-
     const snap = await getDoc(dmRef)
     if (!snap.exists()) {
       await setDoc(dmRef, {
@@ -144,127 +150,219 @@ export default function Directory() {
     <>
       {/* ── Directory list ── */}
       <div className="px-4 py-4 space-y-3">
-        <input
-          className="input-field text-sm"
-          placeholder="Search by name…"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
+        {/* Search */}
+        <div className="relative">
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
+            style={{ color: '#57534e' }}
+          />
+          <input
+            className="input-field text-sm pl-9"
+            placeholder="Search by name…"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+        </div>
 
         {filtered.length === 0 && (
           <div className="text-center py-12">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3" style={{ background: 'rgba(74,108,247,0.1)' }}>
-              <Users className="w-6 h-6" style={{ color: '#4a6cf7' }} />
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3"
+              style={{ background: 'rgba(74,108,247,0.08)', border: '1px solid rgba(74,108,247,0.15)' }}
+            >
+              <Users className="w-5 h-5" style={{ color: '#4a6cf7' }} />
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm" style={{ color: '#57534e' }}>
               {search ? 'No users match that name.' : 'No other users yet.'}
             </p>
           </div>
         )}
 
-        {filtered.map(u => {
-          const badge = PLAN_BADGE[u.plan]
-          return (
-            <div key={u.id} className="card flex items-center gap-3">
-              <Avatar name={u.displayName} color={u.avatarColor} size={40} />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white truncate">
-                  {u.displayName || 'User'}
-                </p>
-                {badge && (
-                  <div className="flex items-center gap-1 mt-0.5">
-                    <badge.Icon className="w-3 h-3 text-accent" />
-                    <p className="text-xs text-gray-500">{badge.label}</p>
-                  </div>
-                )}
-              </div>
-              <button
-                onClick={() => openDm(u)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-accent text-accent text-xs font-semibold hover:bg-accent/10 transition-colors shrink-0 cursor-pointer"
+        <motion.div
+          className="space-y-2"
+          initial="hidden"
+          animate="show"
+          variants={{ show: { transition: { staggerChildren: 0.05 } } }}
+        >
+          {filtered.map(u => {
+            const badge = PLAN_BADGE[u.plan]
+            return (
+              <motion.div
+                key={u.id}
+                className="rounded-xl p-3 flex items-center gap-3"
+                style={CARD}
+                variants={{
+                  hidden: { opacity: 0, y: 8 },
+                  show: { opacity: 1, y: 0, transition: { duration: 0.26, ease: [0.16, 1, 0.3, 1] } },
+                }}
               >
-                <MessageSquare className="w-3.5 h-3.5" />
-                Message
-              </button>
-            </div>
-          )
-        })}
+                <Avatar name={u.displayName} color={u.avatarColor} size={40} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold truncate" style={{ color: '#f0ede6' }}>
+                    {u.displayName || 'User'}
+                  </p>
+                  {badge && (
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <badge.Icon className="w-3 h-3" style={{ color: '#4a6cf7' }} />
+                      <p className="text-xs" style={{ color: '#57534e' }}>{badge.label}</p>
+                    </div>
+                  )}
+                </div>
+                <motion.button
+                  onClick={() => openDm(u)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0 cursor-pointer"
+                  style={{
+                    background: 'rgba(74,108,247,0.1)',
+                    border: '1px solid rgba(74,108,247,0.25)',
+                    color: '#4a6cf7',
+                  }}
+                  whileHover={{ background: 'rgba(74,108,247,0.18)' }}
+                  whileTap={{ scale: 0.94 }}
+                  transition={{ duration: 0.1 }}
+                >
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  Message
+                </motion.button>
+              </motion.div>
+            )
+          })}
+        </motion.div>
       </div>
 
       {/* ── DM overlay ── */}
-      {dmOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col" style={{ background: '#0e0e0c' }}>
-          {/* Header */}
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 shrink-0">
-            <button
-              onClick={closeDm}
-              className="text-gray-400 hover:text-white transition-colors cursor-pointer mr-1"
+      <AnimatePresence>
+        {dmOpen && (
+          <motion.div
+            className="fixed inset-0 z-50 flex flex-col"
+            style={{ background: '#0e0e0c' }}
+            initial={{ opacity: 0, x: '100%' }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: '100%' }}
+            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {/* DM Header */}
+            <div
+              className="flex items-center gap-3 px-4 py-3 shrink-0"
+              style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
             >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <Avatar name={dmUser?.displayName} color={dmUser?.avatarColor} size={32} />
-            <div>
-              <p className="text-sm font-semibold text-white">{dmUser?.displayName || 'User'}</p>
-              {PLAN_BADGE[dmUser?.plan] && (
-                <p className="text-xs text-gray-500 capitalize">{dmUser.plan} plan</p>
-              )}
-            </div>
-          </div>
-
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
-            {messages.length === 0 && (
-              <div className="text-center py-16">
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3" style={{ background: 'rgba(74,108,247,0.1)' }}>
-                  <MessageSquare className="w-6 h-6" style={{ color: '#4a6cf7' }} />
-                </div>
-                <p className="text-sm text-gray-500">
-                  Say hello to {dmUser?.displayName}!
+              <motion.button
+                onClick={closeDm}
+                className="cursor-pointer mr-1"
+                style={{ color: '#57534e' }}
+                whileHover={{ color: '#f0ede6' }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ duration: 0.1 }}
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </motion.button>
+              <Avatar name={dmUser?.displayName} color={dmUser?.avatarColor} size={32} />
+              <div>
+                <p className="text-sm font-semibold" style={{ color: '#f0ede6' }}>
+                  {dmUser?.displayName || 'User'}
                 </p>
+                {PLAN_BADGE[dmUser?.plan] && (
+                  <p className="text-xs capitalize" style={{ color: '#57534e' }}>{dmUser.plan} plan</p>
+                )}
               </div>
-            )}
-            {messages.map(m => {
-              const isMe = m.uid === user.uid
-              return (
-                <div key={m.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                  <div
-                    className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
-                      isMe
-                        ? 'bg-accent text-gray-900 rounded-tr-sm'
-                        : 'rounded-tl-sm border border-gray-800'
-                    }`}
-                    style={!isMe ? { background: '#272420' } : {}}
-                  >
-                    <p>{m.content}</p>
-                    <p className={`text-xs mt-1 ${isMe ? 'text-gray-700' : 'text-gray-500'}`}>
-                      {timeAgo(m.createdAt)}
-                    </p>
-                  </div>
-                </div>
-              )
-            })}
-            <div ref={msgEndRef} />
-          </div>
+            </div>
 
-          {/* Input */}
-          <div className="shrink-0 border-t border-gray-800 px-4 py-3 flex gap-2 items-center">
-            <input
-              className="flex-1 rounded-2xl px-4 py-2.5 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-accent border border-gray-800"
-              style={{ background: '#1d1d1a' }}
-              placeholder={`Message ${dmUser?.displayName || 'User'}…`}
-              value={msgText}
-              onChange={e => setMsgText(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && sendMessage()}
-            />
-            <button
-              onClick={sendMessage}
-              disabled={!msgText.trim() || sending}
-              className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-gray-900 disabled:opacity-40 shrink-0 cursor-pointer transition-opacity hover:opacity-90"
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
+              {messages.length === 0 && (
+                <motion.div
+                  className="text-center py-16"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.15, duration: 0.3 }}
+                >
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3"
+                    style={{ background: 'rgba(74,108,247,0.08)', border: '1px solid rgba(74,108,247,0.15)' }}
+                  >
+                    <MessageSquare className="w-5 h-5" style={{ color: '#4a6cf7' }} />
+                  </div>
+                  <p className="text-sm" style={{ color: '#57534e' }}>
+                    Say hello to {dmUser?.displayName}!
+                  </p>
+                </motion.div>
+              )}
+
+              <AnimatePresence initial={false}>
+                {messages.map(m => {
+                  const isMe = m.uid === user.uid
+                  return (
+                    <motion.div
+                      key={m.id}
+                      className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
+                      initial={{ opacity: 0, y: 6, scale: 0.97 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                    >
+                      <div
+                        className="max-w-[75%] px-4 py-2.5 text-sm leading-relaxed"
+                        style={
+                          isMe
+                            ? {
+                                background: 'linear-gradient(135deg, #4a6cf7 0%, #3655e5 100%)',
+                                color: '#fff',
+                                borderRadius: '14px 14px 4px 14px',
+                                boxShadow: '0 2px 12px rgba(74,108,247,0.25)',
+                              }
+                            : {
+                                background: '#1d1d1a',
+                                color: '#ccc9c2',
+                                borderRadius: '4px 14px 14px 14px',
+                                border: '1px solid rgba(255,255,255,0.07)',
+                              }
+                        }
+                      >
+                        <p>{m.content}</p>
+                        <p
+                          className="text-[10px] mt-1"
+                          style={{ color: isMe ? 'rgba(255,255,255,0.5)' : '#3d3a35' }}
+                        >
+                          {timeAgo(m.createdAt)}
+                        </p>
+                      </div>
+                    </motion.div>
+                  )
+                })}
+              </AnimatePresence>
+              <div ref={msgEndRef} />
+            </div>
+
+            {/* Input */}
+            <div
+              className="shrink-0 px-4 py-3 flex gap-2 items-center"
+              style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
             >
-              <Send className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
+              <input
+                className="flex-1 rounded-xl px-4 py-2.5 text-sm focus:outline-none"
+                style={{
+                  background: '#1d1d1a',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  color: '#ccc9c2',
+                }}
+                placeholder={`Message ${dmUser?.displayName || 'User'}…`}
+                value={msgText}
+                onChange={e => setMsgText(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && sendMessage()}
+              />
+              <motion.button
+                onClick={sendMessage}
+                disabled={!msgText.trim() || sending}
+                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 cursor-pointer disabled:opacity-40"
+                style={{ background: 'linear-gradient(135deg, #4a6cf7 0%, #3655e5 100%)' }}
+                whileHover={{ scale: 1.06 }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ duration: 0.1 }}
+              >
+                <Send className="w-4 h-4" style={{ color: '#fff' }} />
+              </motion.button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }

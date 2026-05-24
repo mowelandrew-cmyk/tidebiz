@@ -4,6 +4,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Premium easing tokens ─────────────────────────── */
+:root {
+  --ease-expo-out:  cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-quart-out: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-quint-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 @layer base {
   html, body, #root {
     height: 100%;
@@ -11,6 +18,7 @@
     color: #e8e6e1;
     font-family: 'DM Sans', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   html[data-fontsize="small"]  { font-size: 13px; }
@@ -23,9 +31,13 @@
 
   h1, h2, h3 {
     font-family: 'Space Grotesk', 'DM Sans', system-ui, sans-serif;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
     color: #f0ede6;
+    font-weight: 700;
   }
+
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.125rem; }
 }
 
 @layer components {
@@ -37,16 +49,19 @@
     background: linear-gradient(135deg, #4a6cf7 0%, #3655e5 100%);
     color: #fff;
     letter-spacing: 0.01em;
-    transition: all 0.15s ease;
+    transition: transform 100ms var(--ease-expo-out),
+                box-shadow 100ms var(--ease-expo-out),
+                background 80ms ease;
   }
   .btn-primary:hover:not(:disabled) {
     background: linear-gradient(135deg, #5b7af8 0%, #4a6cf7 100%);
-    box-shadow: 0 4px 20px rgba(74, 108, 247, 0.28), 0 1px 4px rgba(0,0,0,0.4);
+    box-shadow: 0 4px 24px rgba(74, 108, 247, 0.32), 0 1px 4px rgba(0,0,0,0.4);
     transform: translateY(-1px);
   }
   .btn-primary:active:not(:disabled) {
-    transform: scale(0.97) translateY(0);
-    box-shadow: none;
+    transform: scale(0.97);
+    box-shadow: 0 1px 4px rgba(74, 108, 247, 0.15);
+    transition-duration: 80ms;
   }
 
   /* ── Secondary button ─────────────────────────── */
@@ -55,39 +70,69 @@
     color: #a09d97;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    transition: all 0.15s ease;
+    transition: color 100ms ease, background 100ms ease, border-color 100ms ease;
   }
   .btn-secondary:hover {
     color: #e8e6e1;
     background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+  .btn-secondary:active {
+    transform: scale(0.97);
+    transition-duration: 80ms;
   }
 
   /* ── Input / textarea ─────────────────────────── */
   .input-field {
-    @apply w-full rounded-xl px-4 py-3 placeholder-gray-600 focus:outline-none;
+    @apply w-full rounded-lg px-4 py-3 placeholder-gray-600 focus:outline-none;
     background: #1d1d1a;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.07);
     color: #e8e6e1;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    transition: border-color 120ms ease, box-shadow 120ms ease;
   }
   .input-field:focus {
-    border-color: rgba(74, 108, 247, 0.45);
+    border-color: rgba(74, 108, 247, 0.5);
     box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
   }
 
   /* ── Card ─────────────────────────────────────── */
-  /* Warm charcoal — no more blue-tinted navy gradient */
   .card {
-    @apply rounded-2xl p-4;
+    @apply rounded-xl p-4;
     background: #1d1d1a;
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.45),
-      0 4px 16px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      0 1px 1px rgba(0, 0, 0, 0.5),
+      0 2px 8px rgba(0, 0, 0, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.035);
+  }
+
+  /* ── Skeleton loader ──────────────────────────── */
+  .skeleton {
+    @apply rounded-lg;
+    background: linear-gradient(
+      90deg,
+      rgba(255,255,255,0.04) 25%,
+      rgba(255,255,255,0.08) 50%,
+      rgba(255,255,255,0.04) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.8s linear infinite;
+  }
+
+  /* ── Section label ────────────────────────────── */
+  .section-label {
+    @apply text-xs font-medium;
+    color: #57534e;
+    letter-spacing: 0.01em;
   }
 }
+
+/* ── Stagger animation helpers ───────────────────── */
+.stagger-1 { animation-delay: 60ms; }
+.stagger-2 { animation-delay: 120ms; }
+.stagger-3 { animation-delay: 180ms; }
+.stagger-4 { animation-delay: 240ms; }
+.stagger-5 { animation-delay: 300ms; }
 
 /* ── Journal editor placeholder ─────────────────── */
 .journal-editor[data-placeholder]:empty:before {
@@ -104,3 +149,12 @@
 .entry-content u      { text-decoration: underline; }
 .entry-content s,
 .entry-content strike { text-decoration: line-through; }
+
+/* ── Reduced motion ──────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

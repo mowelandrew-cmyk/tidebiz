@@ -1,6 +1,16 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { useAuth } from '../../context/AuthContext'
+
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.07, delayChildren: 0.1 } },
+}
+const item = {
+  hidden: { opacity: 0, y: 12 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.38, ease: [0.16, 1, 0.3, 1] } },
+}
 
 export default function Login() {
   const { logIn, logInWithGoogle } = useAuth()
@@ -38,16 +48,32 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-surface">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-white">TideBiz</h1>
-          <p className="text-gray-400 mt-1 text-sm">Your business hub, built for you</p>
-        </div>
+    <div className="min-h-screen flex flex-col items-center justify-center px-6" style={{ background: '#0e0e0c' }}>
+      <motion.div
+        className="w-full max-w-sm"
+        variants={container}
+        initial="hidden"
+        animate="show"
+      >
+        {/* Logo */}
+        <motion.div variants={item} className="mb-10 text-center">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg, #4a6cf7 0%, #3655e5 100%)' }}
+            >
+              <span className="text-white font-bold text-sm">T</span>
+            </div>
+            <span className="font-bold text-xl" style={{ color: '#f0ede6', letterSpacing: '-0.03em' }}>
+              TideBiz
+            </span>
+          </div>
+          <p className="text-sm" style={{ color: '#57534e' }}>Your business hub, built for you</p>
+        </motion.div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm text-gray-400 mb-1">Email</label>
+          <motion.div variants={item} className="space-y-1.5">
+            <label className="section-label">Email</label>
             <input
               type="email"
               className="input-field"
@@ -56,9 +82,10 @@ export default function Login() {
               onChange={e => setEmail(e.target.value)}
               required
             />
-          </div>
-          <div>
-            <label className="block text-sm text-gray-400 mb-1">Password</label>
+          </motion.div>
+
+          <motion.div variants={item} className="space-y-1.5">
+            <label className="section-label">Password</label>
             <input
               type="password"
               className="input-field"
@@ -67,34 +94,52 @@ export default function Login() {
               onChange={e => setPassword(e.target.value)}
               required
             />
-          </div>
+          </motion.div>
 
-          {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+          {error && (
+            <motion.p
+              className="text-sm text-center"
+              style={{ color: '#f43f5e' }}
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              {error}
+            </motion.p>
+          )}
 
-          <button type="submit" className="btn-primary" disabled={loading}>
-            {loading ? 'Signing in…' : 'Sign In'}
-          </button>
+          <motion.div variants={item}>
+            <button type="submit" className="btn-primary" disabled={loading}>
+              {loading ? 'Signing in…' : 'Sign In'}
+            </button>
+          </motion.div>
         </form>
 
-        <div className="relative my-5">
+        <motion.div variants={item} className="relative my-6">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-700" />
+            <div className="w-full" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }} />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="bg-surface px-3 text-gray-500">or</span>
+            <span className="px-3 text-xs" style={{ background: '#0e0e0c', color: '#3d3a35' }}>or</span>
           </div>
-        </div>
+        </motion.div>
 
-        <button onClick={handleGoogle} className="btn-secondary flex items-center justify-center gap-3" disabled={loading}>
-          <GoogleIcon />
-          Continue with Google
-        </button>
+        <motion.div variants={item}>
+          <button
+            onClick={handleGoogle}
+            className="btn-secondary flex items-center justify-center gap-3"
+            disabled={loading}
+          >
+            <GoogleIcon />
+            Continue with Google
+          </button>
+        </motion.div>
 
-        <p className="text-center text-gray-500 text-sm mt-6">
+        <motion.p variants={item} className="text-center text-sm mt-6" style={{ color: '#57534e' }}>
           Don't have an account?{' '}
-          <Link to="/signup" className="text-accent hover:underline">Sign up</Link>
-        </p>
-      </div>
+          <Link to="/signup" className="hover:underline" style={{ color: '#4a6cf7' }}>Sign up</Link>
+        </motion.p>
+      </motion.div>
     </div>
   )
 }

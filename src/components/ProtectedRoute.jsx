@@ -6,8 +6,15 @@ export default function ProtectedRoute({ children }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-surface">
-        <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0e0e0c' }}>
+        <div
+          className="w-2 h-2 rounded-full"
+          style={{
+            background: '#4a6cf7',
+            boxShadow: '0 0 12px rgba(74,108,247,0.8)',
+            animation: 'pulse 1.4s ease-in-out infinite',
+          }}
+        />
       </div>
     )
   }

@@ -54,7 +54,7 @@ export default function EntryEditor({ initialTitle = '', initialContent = '', on
         onChange={e => setTitle(e.target.value)}
       />
 
-      <div className="flex gap-1 p-1 bg-surface rounded-xl border border-gray-700">
+      <div className="flex gap-1 p-1 rounded-xl" style={{ background: '#161613', border: '1px solid rgba(255,255,255,0.06)' }}>
         <ToolbarBtn onClick={() => format('bold')} title="Bold" isActive={activeFormats.bold}>
           <span className="font-bold text-sm">B</span>
         </ToolbarBtn>
@@ -83,8 +83,11 @@ export default function EntryEditor({ initialTitle = '', initialContent = '', on
       <div className="flex items-center justify-between">
         <div className="flex gap-2 ml-auto">
           {onCancel && (
-            <button onClick={onCancel}
-              className="px-4 py-2 rounded-xl text-sm text-gray-400 hover:text-gray-200 transition-colors">
+            <button
+              onClick={onCancel}
+              className="px-4 py-2 rounded-xl text-sm transition-colors cursor-pointer"
+              style={{ color: '#57534e' }}
+            >
               Cancel
             </button>
           )}
@@ -111,10 +114,8 @@ function ToolbarBtn({ onClick, title, children, isActive }) {
       }}
       title={title}
       className={`w-8 h-8 flex items-center justify-center rounded-lg transition-colors
-        ${isActive
-          ? 'bg-accent text-gray-900'
-          : 'text-gray-400 hover:text-white hover:bg-surface-raised'
-        }`}
+        `}
+        style={isActive ? { background: '#4a6cf7', color: '#fff' } : { color: '#57534e' }}
     >
       {children}
     </button>
