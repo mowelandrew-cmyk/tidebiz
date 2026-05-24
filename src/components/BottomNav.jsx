@@ -15,8 +15,9 @@ export default function BottomNav() {
       className="fixed bottom-0 left-0 right-0 z-50 flex items-stretch"
       style={{
         paddingBottom: 'env(safe-area-inset-bottom)',
-        background: 'linear-gradient(180deg, #131825 0%, #0f1117 100%)',
+        background: 'linear-gradient(180deg, #1d1d1a 0%, #0e0e0c 100%)',
         borderTop: '1px solid rgba(255,255,255,0.06)',
+        boxShadow: '0 -1px 0 rgba(255,255,255,0.04)',
       }}
     >
       {tabs.map(({ to, label, icon: Icon }) => (

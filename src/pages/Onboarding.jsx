@@ -132,7 +132,7 @@ export default function Onboarding() {
 
   // ── Splash ──────────────────────────────────────────────────────────────────
   if (step === 0) return (
-    <div className="h-screen bg-gray-900 flex items-center justify-center">
+    <div className="h-screen bg-surface flex items-center justify-center">
       <div className={`text-center transition-all duration-700 ${splashIn ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
         <div className="text-8xl mb-5">🌊</div>
         <h1 className="text-5xl font-bold text-white tracking-tight">TideBiz</h1>
@@ -143,7 +143,7 @@ export default function Onboarding() {
 
   // ── Done ────────────────────────────────────────────────────────────────────
   if (step === 4) return (
-    <div className="h-screen bg-gray-900 flex items-center justify-center px-8 text-center">
+    <div className="h-screen bg-surface flex items-center justify-center px-8 text-center">
       <div>
         <div className="text-7xl mb-5">🎉</div>
         <h2 className="text-3xl font-bold text-white">You're all set!</h2>
@@ -157,7 +157,7 @@ export default function Onboarding() {
 
   // ── Steps 1–3 ───────────────────────────────────────────────────────────────
   return (
-    <div className="h-screen bg-gray-900 flex flex-col overflow-hidden">
+    <div className="h-screen bg-surface flex flex-col overflow-hidden">
       {/* Progress bar */}
       <div className="px-6 pt-14 pb-5 shrink-0">
         <div className="h-1 bg-gray-800 rounded-full overflow-hidden">

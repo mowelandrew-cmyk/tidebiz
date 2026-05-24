@@ -192,7 +192,7 @@ export default function Directory() {
 
       {/* ── DM overlay ── */}
       {dmOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col" style={{ background: '#0f1117' }}>
+        <div className="fixed inset-0 z-50 flex flex-col" style={{ background: '#0e0e0c' }}>
           {/* Header */}
           <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 shrink-0">
             <button
@@ -232,7 +232,7 @@ export default function Directory() {
                         ? 'bg-accent text-gray-900 rounded-tr-sm'
                         : 'rounded-tl-sm border border-gray-800'
                     }`}
-                    style={!isMe ? { background: 'linear-gradient(160deg, #161b28 0%, #131825 100%)' } : {}}
+                    style={!isMe ? { background: '#272420' } : {}}
                   >
                     <p>{m.content}</p>
                     <p className={`text-xs mt-1 ${isMe ? 'text-gray-700' : 'text-gray-500'}`}>
@@ -249,7 +249,7 @@ export default function Directory() {
           <div className="shrink-0 border-t border-gray-800 px-4 py-3 flex gap-2 items-center">
             <input
               className="flex-1 rounded-2xl px-4 py-2.5 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-accent border border-gray-800"
-              style={{ background: 'linear-gradient(160deg, #161b28 0%, #131825 100%)' }}
+              style={{ background: '#1d1d1a' }}
               placeholder={`Message ${dmUser?.displayName || 'User'}…`}
               value={msgText}
               onChange={e => setMsgText(e.target.value)}

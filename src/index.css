@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,8 +7,10 @@
 @layer base {
   html, body, #root {
     height: 100%;
-    background-color: #0f1117;
-    color: #f1f5f9;
+    background-color: #0e0e0c;
+    color: #e8e6e1;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
 
   html[data-fontsize="small"]  { font-size: 13px; }
@@ -20,21 +22,26 @@
   }
 
   h1, h2, h3 {
-    font-family: 'Space Grotesk', Inter, system-ui, sans-serif;
-    letter-spacing: -0.025em;
+    font-family: 'Space Grotesk', 'DM Sans', system-ui, sans-serif;
+    letter-spacing: -0.02em;
+    color: #f0ede6;
   }
 }
 
 @layer components {
+
+  /* ── Primary button ───────────────────────────── */
   .btn-primary {
     @apply font-semibold py-3 px-6 rounded-xl
-           disabled:opacity-50 disabled:cursor-not-allowed w-full text-white;
+           disabled:opacity-50 disabled:cursor-not-allowed w-full;
     background: linear-gradient(135deg, #4a6cf7 0%, #3655e5 100%);
+    color: #fff;
+    letter-spacing: 0.01em;
     transition: all 0.15s ease;
   }
   .btn-primary:hover:not(:disabled) {
-    background: linear-gradient(135deg, #5b7cf8 0%, #4a6cf7 100%);
-    box-shadow: 0 4px 24px rgba(74, 108, 247, 0.35);
+    background: linear-gradient(135deg, #5b7af8 0%, #4a6cf7 100%);
+    box-shadow: 0 4px 20px rgba(74, 108, 247, 0.28), 0 1px 4px rgba(0,0,0,0.4);
     transform: translateY(-1px);
   }
   .btn-primary:active:not(:disabled) {
@@ -42,47 +49,58 @@
     box-shadow: none;
   }
 
+  /* ── Secondary button ─────────────────────────── */
   .btn-secondary {
-    @apply font-medium py-3 px-6 rounded-xl
-           active:scale-95 w-full text-gray-300 hover:text-white;
-    background: rgba(255, 255, 255, 0.04);
+    @apply font-medium py-3 px-6 rounded-xl w-full;
+    color: #a09d97;
+    background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.08);
     transition: all 0.15s ease;
   }
   .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.07);
-    border-color: rgba(255, 255, 255, 0.13);
+    color: #e8e6e1;
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.12);
   }
 
+  /* ── Input / textarea ─────────────────────────── */
   .input-field {
-    @apply w-full rounded-xl px-4 py-3 text-gray-100 placeholder-gray-600 focus:outline-none;
-    background: rgba(255, 255, 255, 0.04);
+    @apply w-full rounded-xl px-4 py-3 placeholder-gray-600 focus:outline-none;
+    background: #1d1d1a;
     border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #e8e6e1;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
   }
   .input-field:focus {
-    border-color: rgba(74, 108, 247, 0.55);
-    box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.12);
+    border-color: rgba(74, 108, 247, 0.45);
+    box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
   }
 
+  /* ── Card ─────────────────────────────────────── */
+  /* Warm charcoal — no more blue-tinted navy gradient */
   .card {
     @apply rounded-2xl p-4;
-    background: linear-gradient(160deg, #161b28 0%, #131825 100%);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    background: #1d1d1a;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.45),
+      0 4px 16px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
   }
 }
 
+/* ── Journal editor placeholder ─────────────────── */
 .journal-editor[data-placeholder]:empty:before {
   content: attr(data-placeholder);
-  color: #6b7280;
+  color: #57534e;
   pointer-events: none;
 }
 
+/* ── Rich text entry display ─────────────────────── */
 .entry-content b,
 .entry-content strong { font-weight: 700; }
 .entry-content i,
-.entry-content em { font-style: italic; }
-.entry-content u { text-decoration: underline; }
+.entry-content em     { font-style: italic; }
+.entry-content u      { text-decoration: underline; }
 .entry-content s,
 .entry-content strike { text-decoration: line-through; }

@@ -168,7 +168,7 @@ export default function Forums() {
   if (view === 'threads') return (
     <div>
       {/* Sub-header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 sticky top-12 z-10" style={{ background: '#0f1117' }}>
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 sticky top-12 z-10" style={{ background: '#0e0e0c' }}>
         <button onClick={goBack} className="text-gray-400 hover:text-white transition-colors cursor-pointer"><ArrowLeft className="w-5 h-5" /></button>
         <span className="text-sm font-semibold text-white flex-1">{category.emoji} {category.label}</span>
         <button onClick={() => setShowNewThread(v => !v)} className="text-xs text-accent font-semibold">
@@ -240,7 +240,7 @@ export default function Forums() {
   return (
     <div>
       {/* Sub-header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 sticky top-12 z-10" style={{ background: '#0f1117' }}>
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 sticky top-12 z-10" style={{ background: '#0e0e0c' }}>
         <button onClick={goBack} className="text-gray-400 hover:text-white transition-colors cursor-pointer"><ArrowLeft className="w-5 h-5" /></button>
         <span className="text-sm font-semibold text-white line-clamp-1 flex-1">{thread.title}</span>
       </div>
