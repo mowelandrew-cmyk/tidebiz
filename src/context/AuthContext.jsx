@@ -6,8 +6,12 @@ import {
   signInWithPopup,
   signOut,
   updateProfile,
+  deleteUser,
 } from 'firebase/auth'
-import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore'
+import {
+  doc, setDoc, getDoc, updateDoc, deleteDoc,
+  collection, getDocs, serverTimestamp,
+} from 'firebase/firestore'
 import { auth, db, googleProvider } from '../firebase/config'
 
 const AuthContext = createContext(null)
@@ -37,14 +41,10 @@ export function AuthProvider({ children }) {
 
   async function signUp(email, password, displayName) {
     const cred = await createUserWithEmailAndPassword(auth, email, password)
-    // Use allSettled so a failure in secondary ops never blocks navigation
     const [profileResult, docResult] = await Promise.allSettled([
       updateProfile(cred.user, { displayName }),
       setDoc(doc(db, 'users', cred.user.uid), {
-        displayName,
-        email,
-        plan: 'free',
-        createdAt: serverTimestamp(),
+        displayName, email, plan: 'free', createdAt: serverTimestamp(),
       }),
     ])
     if (profileResult.status === 'rejected') console.error('updateProfile failed:', profileResult.reason)
@@ -72,8 +72,39 @@ export function AuthProvider({ children }) {
     return signOut(auth)
   }
 
+  async function updateDisplayName(name) {
+    if (!user) return
+    await Promise.all([
+      updateProfile(user, { displayName: name }),
+      updateDoc(doc(db, 'users', user.uid), { displayName: name }),
+    ])
+    setUserProfile(prev => ({ ...prev, displayName: name }))
+  }
+
+  async function updateAvatarColor(color) {
+    if (!user) return
+    await updateDoc(doc(db, 'users', user.uid), { avatarColor: color })
+    setUserProfile(prev => ({ ...prev, avatarColor: color }))
+  }
+
+  async function deleteAccount() {
+    if (!user) return
+    const uid = user.uid
+    // Delete all subcollection docs
+    for (const sub of ['journal', 'entries', 'reminders']) {
+      const snap = await getDocs(collection(db, 'users', uid, sub))
+      await Promise.all(snap.docs.map(d => deleteDoc(d.ref)))
+    }
+    await deleteDoc(doc(db, 'users', uid))
+    await deleteUser(user)
+  }
+
   return (
-    <AuthContext.Provider value={{ user, userProfile, loading, signUp, logIn, logInWithGoogle, logOut }}>
+    <AuthContext.Provider value={{
+      user, userProfile, loading,
+      signUp, logIn, logInWithGoogle, logOut,
+      updateDisplayName, updateAvatarColor, deleteAccount,
+    }}>
       {children}
     </AuthContext.Provider>
   )

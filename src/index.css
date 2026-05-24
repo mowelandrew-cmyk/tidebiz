@@ -11,6 +11,10 @@
     color: #f9fafb;
   }
 
+  html[data-fontsize="small"]  { font-size: 13px; }
+  html[data-fontsize="medium"] { font-size: 15px; }
+  html[data-fontsize="large"]  { font-size: 17px; }
+
   * {
     -webkit-tap-highlight-color: transparent;
   }
