@@ -2,14 +2,16 @@ import Stripe from 'stripe'
 import { initializeApp, getApps, cert } from 'firebase-admin/app'
 import { getFirestore } from 'firebase-admin/firestore'
 
-// Initialize Firebase Admin once per warm Lambda instance
-const apps = getApps()
-const adminApp = apps.length
-  ? apps[0]
-  : initializeApp({ credential: cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)) })
-
-const adminDb = getFirestore(adminApp)
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+
+// Lazy init — avoids module-level crash if env var is missing
+function getAdminDb() {
+  const apps = getApps()
+  const app = apps.length
+    ? apps[0]
+    : initializeApp({ credential: cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)) })
+  return getFirestore(app)
+}
 
 const PRICE_TO_PLAN = {
   [process.env.STRIPE_PRO_PRICE_ID]: 'pro',
@@ -56,7 +58,7 @@ export default async function handler(req, res) {
         const subscriptionId = session.subscription
 
         if (uid && plan && customerId) {
-          await adminDb.doc(`users/${uid}`).update({
+          await getAdminDb().doc(`users/${uid}`).update({
             plan,
             stripeCustomerId: customerId,
             stripeSubscriptionId: subscriptionId || null,
@@ -77,7 +79,7 @@ export default async function handler(req, res) {
         const plan = PRICE_TO_PLAN[priceId]
 
         if (plan) {
-          const snap = await adminDb.collection('users')
+          const snap = await getAdminDb().collection('users')
             .where('stripeCustomerId', '==', customerId)
             .limit(1)
             .get()
@@ -100,7 +102,7 @@ export default async function handler(req, res) {
         const priceId = invoice.lines?.data?.[0]?.price?.id
         const plan = PRICE_TO_PLAN[priceId]
 
-        const snap = await adminDb.collection('users')
+        const snap = await getAdminDb().collection('users')
           .where('stripeCustomerId', '==', customerId)
           .limit(1)
           .get()
@@ -118,7 +120,7 @@ export default async function handler(req, res) {
         const invoice = event.data.object
         const customerId = invoice.customer
 
-        const snap = await adminDb.collection('users')
+        const snap = await getAdminDb().collection('users')
           .where('stripeCustomerId', '==', customerId)
           .limit(1)
           .get()
@@ -134,7 +136,7 @@ export default async function handler(req, res) {
         const sub = event.data.object
         const customerId = sub.customer
 
-        const snap = await adminDb.collection('users')
+        const snap = await getAdminDb().collection('users')
           .where('stripeCustomerId', '==', customerId)
           .limit(1)
           .get()
