@@ -23,7 +23,7 @@ const PLANS = [
   {
     key: 'max',
     label: 'Max',
-    price: '$18/mo',
+    price: '$15/mo',
     features: ['200 AI messages/week', 'Full entry history', 'Claude Sonnet AI', 'Early feature access'],
   },
 ]

@@ -33,7 +33,7 @@ const PLANS = [
     features: ['100 AI messages/week', 'Full entry history', 'Claude Haiku AI', 'Priority support'],
   },
   {
-    key: 'max', label: 'Max', price: '$18/mo', badge: null,
+    key: 'max', label: 'Max', price: '$15/mo', badge: null,
     features: ['200 AI messages/week', 'Full entry history', 'Claude Sonnet AI', 'Early feature access'],
   },
 ]
