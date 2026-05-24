@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── User profiles ───────────────────────────────────────────────────────
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // Ledger entries subcollection
+      match /entries/{entryId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Journal entries subcollection
+      match /journal/{entryId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Reminders subcollection
+      match /reminders/{reminderId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // ── Community feed posts ─────────────────────────────────────────────────
+    match /posts/{postId} {
+      allow read:   if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+
+      match /comments/{commentId} {
+        allow read:   if request.auth != null;
+        allow create: if request.auth != null;
+        allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+      }
+    }
+
+    // ── Forums ────────────────────────────────────────────────────────────────
+    match /forums/{categoryId}/threads/{threadId} {
+      allow read:   if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+
+      match /replies/{replyId} {
+        allow read:   if request.auth != null;
+        allow create: if request.auth != null;
+        allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+      }
+    }
+
+    // ── Direct messages ───────────────────────────────────────────────────────
+    match /dms/{dmId} {
+      allow read, create: if request.auth != null;
+      allow update: if request.auth != null
+                    && request.auth.uid in resource.data.participants;
+
+      match /messages/{messageId} {
+        allow read:   if request.auth != null;
+        allow create: if request.auth != null;
+      }
+    }
+  }
+}
