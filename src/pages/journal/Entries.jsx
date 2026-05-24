@@ -124,7 +124,7 @@ export default function Entries({ entries, loading, addEntry, editEntry, removeE
         </div>
       )}
 
-      {/* Empty state */}
+      {/* ── Animation #7: empty state floating icon ── */}
       {filtered.length === 0 && !writing && (
         <motion.div
           className="text-center py-12"
@@ -132,124 +132,133 @@ export default function Entries({ entries, loading, addEntry, editEntry, removeE
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
-          <div
+          <motion.div
             className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3"
             style={{ background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.15)' }}
+            animate={{
+              y: [0, -6, 0],
+              boxShadow: [
+                '0 0 0 0 rgba(167,139,250,0)',
+                '0 10px 24px rgba(167,139,250,0.18)',
+                '0 0 0 0 rgba(167,139,250,0)',
+              ],
+            }}
+            transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
           >
             <BookOpen className="w-5 h-5" style={{ color: '#a78bfa' }} />
-          </div>
+          </motion.div>
           <p className="text-sm" style={{ color: '#57534e' }}>
             {search ? 'No entries match your search.' : 'No entries yet. Write your first one!'}
           </p>
         </motion.div>
       )}
 
-      {/* Entry list */}
-      <motion.div
-        className="space-y-3"
-        initial="hidden"
-        animate="show"
-        variants={{ show: { transition: { staggerChildren: 0.055 } } }}
-      >
-        {filtered.map(entry => {
-          const date = entry.createdAt?.toDate?.()
-          const isExpanded = expandedId === entry.id
-          const isEditing = editingId === entry.id
+      {/* ── Animation #4: scroll-triggered reveals ── */}
+      <div className="space-y-3">
+        <AnimatePresence initial={false}>
+          {filtered.map(entry => {
+            const date = entry.createdAt?.toDate?.()
+            const isExpanded = expandedId === entry.id
+            const isEditing = editingId === entry.id
 
-          if (isEditing) {
+            if (isEditing) {
+              return (
+                <motion.div
+                  key={entry.id}
+                  className="rounded-xl p-4"
+                  style={CARD}
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.97 }}
+                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <p className="text-xs mb-3" style={{ color: '#57534e' }}>
+                    {date?.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                  </p>
+                  <EntryEditor
+                    initialTitle={entry.title ?? ''}
+                    initialContent={entry.content ?? ''}
+                    onSave={handleSave}
+                    onCancel={() => setEditingId(null)}
+                    saving={saving}
+                  />
+                </motion.div>
+              )
+            }
+
+            const needsTruncation = stripHtml(entry.content).length > 200
+
             return (
               <motion.div
                 key={entry.id}
-                className="rounded-xl p-4"
+                layout
+                className="rounded-xl p-4 space-y-2"
                 style={CARD}
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                viewport={{ once: true, amount: 0.08 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
               >
-                <p className="text-xs mb-3" style={{ color: '#57534e' }}>
-                  {date?.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
-                </p>
-                <EntryEditor
-                  initialTitle={entry.title ?? ''}
-                  initialContent={entry.content ?? ''}
-                  onSave={handleSave}
-                  onCancel={() => setEditingId(null)}
-                  saving={saving}
+                {/* Header row */}
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    {entry.title && (
+                      <p className="text-sm font-semibold truncate" style={{ color: '#f0ede6' }}>
+                        {entry.title}
+                      </p>
+                    )}
+                    {date && (
+                      <p className="text-xs mt-0.5" style={{ color: '#57534e' }}>
+                        {date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                        {' · '}
+                        {date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex gap-1 shrink-0">
+                    <button
+                      onClick={() => setEditingId(entry.id)}
+                      className="text-xs px-2 py-1 rounded-lg cursor-pointer transition-colors duration-100"
+                      style={{ color: '#57534e' }}
+                      onMouseEnter={e => e.target.style.color = '#4a6cf7'}
+                      onMouseLeave={e => e.target.style.color = '#57534e'}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => removeEntry(entry.id)}
+                      className="text-xs px-2 py-1 rounded-lg cursor-pointer transition-colors duration-100"
+                      style={{ color: '#57534e' }}
+                      onMouseEnter={e => e.target.style.color = '#f43f5e'}
+                      onMouseLeave={e => e.target.style.color = '#57534e'}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div
+                  className={`entry-content text-sm leading-relaxed ${!isExpanded && needsTruncation ? 'line-clamp-4' : ''}`}
+                  style={{ color: '#a09d97' }}
+                  dangerouslySetInnerHTML={{ __html: entry.content ?? '' }}
                 />
+
+                {needsTruncation && (
+                  <button
+                    onClick={() => setExpandedId(isExpanded ? null : entry.id)}
+                    className="text-xs cursor-pointer hover:underline transition-colors duration-100"
+                    style={{ color: '#4a6cf7' }}
+                  >
+                    {isExpanded ? 'Show less' : 'Read more'}
+                  </button>
+                )}
               </motion.div>
             )
-          }
-
-          const needsTruncation = stripHtml(entry.content).length > 200
-
-          return (
-            <motion.div
-              key={entry.id}
-              className="rounded-xl p-4 space-y-2"
-              style={CARD}
-              variants={{
-                hidden: { opacity: 0, y: 8 },
-                show: { opacity: 1, y: 0, transition: { duration: 0.28, ease: [0.16, 1, 0.3, 1] } },
-              }}
-            >
-              {/* Header row */}
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  {entry.title && (
-                    <p className="text-sm font-semibold truncate" style={{ color: '#f0ede6' }}>
-                      {entry.title}
-                    </p>
-                  )}
-                  {date && (
-                    <p className="text-xs mt-0.5" style={{ color: '#57534e' }}>
-                      {date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-                      {' · '}
-                      {date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                  )}
-                </div>
-                <div className="flex gap-1 shrink-0">
-                  <button
-                    onClick={() => setEditingId(entry.id)}
-                    className="text-xs px-2 py-1 rounded-lg cursor-pointer transition-colors duration-100"
-                    style={{ color: '#57534e' }}
-                    onMouseEnter={e => e.target.style.color = '#4a6cf7'}
-                    onMouseLeave={e => e.target.style.color = '#57534e'}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => removeEntry(entry.id)}
-                    className="text-xs px-2 py-1 rounded-lg cursor-pointer transition-colors duration-100"
-                    style={{ color: '#57534e' }}
-                    onMouseEnter={e => e.target.style.color = '#f43f5e'}
-                    onMouseLeave={e => e.target.style.color = '#57534e'}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-
-              {/* Content */}
-              <div
-                className={`entry-content text-sm leading-relaxed ${!isExpanded && needsTruncation ? 'line-clamp-4' : ''}`}
-                style={{ color: '#a09d97' }}
-                dangerouslySetInnerHTML={{ __html: entry.content ?? '' }}
-              />
-
-              {needsTruncation && (
-                <button
-                  onClick={() => setExpandedId(isExpanded ? null : entry.id)}
-                  className="text-xs cursor-pointer hover:underline transition-colors duration-100"
-                  style={{ color: '#4a6cf7' }}
-                >
-                  {isExpanded ? 'Show less' : 'Read more'}
-                </button>
-              )}
-            </motion.div>
-          )
-        })}
-      </motion.div>
+          })}
+        </AnimatePresence>
+      </div>
     </div>
   )
 }

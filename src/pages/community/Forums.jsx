@@ -241,9 +241,29 @@ export default function Forums() {
       {/* Thread list */}
       <div>
         {threads.length === 0 && (
-          <p className="text-center py-12 text-sm" style={{ color: '#3d3a35' }}>
-            No threads yet. Start one!
-          </p>
+          <motion.div
+            className="text-center py-12"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+          >
+            <motion.div
+              className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3"
+              style={{ background: 'rgba(74,108,247,0.08)', border: '1px solid rgba(74,108,247,0.15)' }}
+              animate={{
+                y: [0, -6, 0],
+                boxShadow: [
+                  '0 0 0 0 rgba(74,108,247,0)',
+                  '0 10px 24px rgba(74,108,247,0.18)',
+                  '0 0 0 0 rgba(74,108,247,0)',
+                ],
+              }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <MessageCircle className="w-5 h-5" style={{ color: '#4a6cf7' }} />
+            </motion.div>
+            <p className="text-sm" style={{ color: '#57534e' }}>No threads yet. Start one!</p>
+          </motion.div>
         )}
         {threads.map((t, i) => (
           <motion.button

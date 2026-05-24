@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useEffect, useRef } from 'react'
+import { motion, animate } from 'framer-motion'
 import { formatAmount } from '../../lib/currencies'
 import { Plus } from 'lucide-react'
 import AddEntryModal from '../../components/logs/AddEntryModal'
@@ -12,6 +12,32 @@ const container = {
 const item = {
   hidden: { opacity: 0, y: 8 },
   show: { opacity: 1, y: 0, transition: { duration: 0.28, ease: [0.16, 1, 0.3, 1] } },
+}
+
+// ① Animated number counter — mutates DOM directly for 60fps, no React re-renders
+function CountUp({ value, format, color, className, style }) {
+  const ref = useRef(null)
+  const prevRef = useRef(0)
+
+  useEffect(() => {
+    if (!isFinite(value) || !ref.current) return
+    const from = prevRef.current
+    prevRef.current = value
+    const controls = animate(from, value, {
+      duration: 0.75,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate(v) {
+        if (ref.current) ref.current.textContent = format(v)
+      },
+    })
+    return () => controls.stop()
+  }, [value])
+
+  return (
+    <span ref={ref} className={className} style={{ color, ...style }}>
+      {format(value)}
+    </span>
+  )
 }
 
 export default function Ledger({ entries, addEntry, editEntry, removeEntry, viewingCurrency, convert, ratesLoading }) {
@@ -43,6 +69,8 @@ export default function Ledger({ entries, addEntry, editEntry, removeEntry, view
     setSelected(null)
   }
 
+  const fmt = v => formatAmount(v, viewingCurrency)
+
   return (
     <motion.div
       className="flex flex-col gap-4 px-4 py-4"
@@ -63,27 +91,33 @@ export default function Ledger({ entries, addEntry, editEntry, removeEntry, view
         <div className="flex items-center justify-between">
           <div>
             <p className="section-label mb-1">Net Profit</p>
-            <p
-              className="text-2xl font-bold tabular-nums"
-              style={{
-                color: profit >= 0 ? '#22c55e' : '#f43f5e',
-                letterSpacing: '-0.03em',
-              }}
-            >
-              {ratesLoading ? '—' : formatAmount(profit, viewingCurrency)}
-            </p>
+            {ratesLoading ? (
+              <span className="text-2xl font-bold" style={{ color: '#3d3a35', letterSpacing: '-0.03em' }}>—</span>
+            ) : (
+              <CountUp
+                value={profit}
+                format={fmt}
+                color={profit >= 0 ? '#22c55e' : '#f43f5e'}
+                className="text-2xl font-bold tabular-nums"
+                style={{ letterSpacing: '-0.03em' }}
+              />
+            )}
           </div>
           <div className="text-right space-y-1.5">
             <div className="flex items-center justify-end gap-1.5">
-              <span className="text-xs tabular-nums" style={{ color: '#22c55e' }}>
-                {ratesLoading ? '—' : formatAmount(totalRevenue, viewingCurrency)}
-              </span>
+              {ratesLoading ? (
+                <span className="text-xs" style={{ color: '#3d3a35' }}>—</span>
+              ) : (
+                <CountUp value={totalRevenue} format={fmt} color="#22c55e" className="text-xs tabular-nums" />
+              )}
               <span className="text-[10px] font-semibold px-1 rounded" style={{ background: 'rgba(34,197,94,0.1)', color: '#22c55e' }}>IN</span>
             </div>
             <div className="flex items-center justify-end gap-1.5">
-              <span className="text-xs tabular-nums" style={{ color: '#f43f5e' }}>
-                {ratesLoading ? '—' : formatAmount(totalExpense, viewingCurrency)}
-              </span>
+              {ratesLoading ? (
+                <span className="text-xs" style={{ color: '#3d3a35' }}>—</span>
+              ) : (
+                <CountUp value={totalExpense} format={fmt} color="#f43f5e" className="text-xs tabular-nums" />
+              )}
               <span className="text-[10px] font-semibold px-1 rounded" style={{ background: 'rgba(244,63,94,0.1)', color: '#f43f5e' }}>OUT</span>
             </div>
           </div>
@@ -119,9 +153,11 @@ export default function Ledger({ entries, addEntry, editEntry, removeEntry, view
           ))}
           {revenues.length > 0 && (
             <div className="pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-              <p className="text-xs text-right font-semibold tabular-nums" style={{ color: '#22c55e' }}>
-                {ratesLoading ? '—' : formatAmount(totalRevenue, viewingCurrency)}
-              </p>
+              {ratesLoading ? (
+                <p className="text-xs text-right" style={{ color: '#3d3a35' }}>—</p>
+              ) : (
+                <CountUp value={totalRevenue} format={fmt} color="#22c55e" className="text-xs block text-right font-semibold tabular-nums" />
+              )}
             </div>
           )}
         </div>
@@ -153,9 +189,11 @@ export default function Ledger({ entries, addEntry, editEntry, removeEntry, view
           ))}
           {expenses.length > 0 && (
             <div className="pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-              <p className="text-xs text-right font-semibold tabular-nums" style={{ color: '#f43f5e' }}>
-                {ratesLoading ? '—' : formatAmount(totalExpense, viewingCurrency)}
-              </p>
+              {ratesLoading ? (
+                <p className="text-xs text-right" style={{ color: '#3d3a35' }}>—</p>
+              ) : (
+                <CountUp value={totalExpense} format={fmt} color="#f43f5e" className="text-xs block text-right font-semibold tabular-nums" />
+              )}
             </div>
           )}
         </div>
@@ -192,14 +230,8 @@ function EntryCard({ entry, viewingCurrency, convert, ratesLoading, onClick, acc
     <motion.button
       onClick={onClick}
       className="w-full text-left rounded-xl px-3 py-2.5 space-y-0.5 cursor-pointer"
-      style={{
-        background: '#1d1d1a',
-        border: '1px solid rgba(255,255,255,0.06)',
-      }}
-      whileHover={{
-        background: accentBg,
-        borderColor: `${accent}30`,
-      }}
+      style={{ background: '#1d1d1a', border: '1px solid rgba(255,255,255,0.06)' }}
+      whileHover={{ background: accentBg, borderColor: `${accent}30` }}
       whileTap={{ scale: 0.97 }}
       transition={{ duration: 0.12, ease: [0.16, 1, 0.3, 1] }}
     >

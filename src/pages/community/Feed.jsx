@@ -43,11 +43,6 @@ function timeAgo(ts) {
   return `${Math.floor(s / 86400)}d ago`
 }
 
-const postVariants = {
-  hidden: { opacity: 0, y: 10 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.28, ease: [0.16, 1, 0.3, 1] } },
-}
-
 export default function Feed() {
   const { user, userProfile } = useAuth()
   const [posts, setPosts] = useState([])
@@ -185,7 +180,7 @@ export default function Feed() {
         </div>
       </motion.div>
 
-      {/* Empty state */}
+      {/* ── Animation #7: empty state floating icon ── */}
       {posts.length === 0 && (
         <motion.div
           className="text-center py-14"
@@ -193,173 +188,194 @@ export default function Feed() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.4 }}
         >
-          <div
+          <motion.div
             className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3"
             style={{ background: 'rgba(74,108,247,0.08)', border: '1px solid rgba(74,108,247,0.15)' }}
+            animate={{
+              y: [0, -6, 0],
+              boxShadow: [
+                '0 0 0 0 rgba(74,108,247,0)',
+                '0 10px 24px rgba(74,108,247,0.18)',
+                '0 0 0 0 rgba(74,108,247,0)',
+              ],
+            }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           >
             <Feather className="w-5 h-5" style={{ color: '#4a6cf7' }} />
-          </div>
+          </motion.div>
           <p className="text-sm" style={{ color: '#57534e' }}>No posts yet. Be the first to share!</p>
         </motion.div>
       )}
 
-      {/* Posts */}
-      <motion.div
-        className="space-y-3"
-        initial="hidden"
-        animate="show"
-        variants={{ show: { transition: { staggerChildren: 0.05 } } }}
-      >
-        {posts.map(p => {
-          const liked = p.likes?.includes(user.uid)
-          const saved = p.saves?.includes(user.uid)
-          const open = expanded[p.id]
-          const postComments = comments[p.id] || []
+      {/* ── Animation #3: live feed arrivals with AnimatePresence + layout ──
+           Animation #4: scroll-triggered reveals with whileInView ── */}
+      <div className="space-y-3">
+        <AnimatePresence initial={false}>
+          {posts.map(p => {
+            const liked = p.likes?.includes(user.uid)
+            const saved = p.saves?.includes(user.uid)
+            const open = expanded[p.id]
+            const postComments = comments[p.id] || []
 
-          return (
-            <motion.div
-              key={p.id}
-              className="rounded-xl p-4 space-y-3"
-              style={CARD}
-              variants={postVariants}
-            >
-              {/* Author + content */}
-              <div className="flex gap-3">
-                <Avatar name={p.displayName} color={p.avatarColor} size={32} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-sm font-semibold truncate" style={{ color: '#f0ede6' }}>
-                      {p.displayName}
-                    </span>
-                    <span className="text-xs shrink-0" style={{ color: '#3d3a35' }}>
-                      {timeAgo(p.createdAt)}
-                    </span>
-                  </div>
-                  <p className="text-sm leading-relaxed mt-1" style={{ color: '#ccc9c2' }}>
-                    {p.content}
-                  </p>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div
-                className="flex items-center gap-5 pt-2"
-                style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}
+            return (
+              <motion.div
+                key={p.id}
+                layout
+                className="rounded-xl p-4 space-y-3"
+                style={CARD}
+                initial={{ opacity: 0, y: 14, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
               >
-                <motion.button
-                  onClick={() => toggleLike(p)}
-                  className="flex items-center gap-1.5 text-xs cursor-pointer"
-                  style={{ color: liked ? '#f43f5e' : '#57534e' }}
-                  whileTap={{ scale: 1.3 }}
-                  transition={{ duration: 0.08, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  <Heart
-                    className="w-3.5 h-3.5"
-                    style={{ fill: liked ? '#f43f5e' : 'none', color: liked ? '#f43f5e' : '#57534e' }}
-                  />
-                  <span>{p.likes?.length || 0}</span>
-                </motion.button>
+                {/* Author + content */}
+                <div className="flex gap-3">
+                  <Avatar name={p.displayName} color={p.avatarColor} size={32} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-sm font-semibold truncate" style={{ color: '#f0ede6' }}>
+                        {p.displayName}
+                      </span>
+                      <span className="text-xs shrink-0" style={{ color: '#3d3a35' }}>
+                        {timeAgo(p.createdAt)}
+                      </span>
+                    </div>
+                    <p className="text-sm leading-relaxed mt-1" style={{ color: '#ccc9c2' }}>
+                      {p.content}
+                    </p>
+                  </div>
+                </div>
 
-                <button
-                  onClick={() => toggleComments(p.id)}
-                  className="flex items-center gap-1.5 text-xs cursor-pointer transition-colors duration-100"
-                  style={{ color: open ? '#4a6cf7' : '#57534e' }}
+                {/* Actions */}
+                <div
+                  className="flex items-center gap-5 pt-2"
+                  style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}
                 >
-                  <MessageCircle className="w-3.5 h-3.5" />
-                  <span>{p.commentCount || 0}</span>
-                </button>
-
-                <motion.button
-                  onClick={() => toggleSave(p)}
-                  className="flex items-center gap-1.5 text-xs cursor-pointer ml-auto"
-                  style={{ color: saved ? '#4a6cf7' : '#57534e' }}
-                  whileTap={{ scale: 1.2 }}
-                  transition={{ duration: 0.08 }}
-                >
-                  <Bookmark
-                    className="w-3.5 h-3.5"
-                    style={{ fill: saved ? '#4a6cf7' : 'none', color: saved ? '#4a6cf7' : '#57534e' }}
-                  />
-                  <span>{saved ? 'Saved' : 'Save'}</span>
-                </motion.button>
-              </div>
-
-              {/* Comments */}
-              <AnimatePresence>
-                {open && (
-                  <motion.div
-                    className="space-y-2.5 pt-2"
-                    style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                  <motion.button
+                    onClick={() => toggleLike(p)}
+                    className="flex items-center gap-1.5 text-xs cursor-pointer"
+                    style={{ color: liked ? '#f43f5e' : '#57534e' }}
+                    whileTap={{ scale: 1.3 }}
+                    transition={{ duration: 0.08, ease: [0.16, 1, 0.3, 1] }}
                   >
-                    {postComments.length === 0 && (
-                      <p className="text-xs text-center py-1" style={{ color: '#3d3a35' }}>
-                        No comments yet.
-                      </p>
-                    )}
-                    {postComments.map(c => (
-                      <div key={c.id} className="flex gap-2">
-                        <Avatar name={c.displayName} color={c.avatarColor} size={24} />
-                        <div
-                          className="flex-1 px-3 py-2 rounded-xl"
-                          style={{
-                            background: 'rgba(255,255,255,0.04)',
-                            border: '1px solid rgba(255,255,255,0.05)',
-                          }}
-                        >
-                          <div className="flex items-baseline gap-1.5">
-                            <span className="text-xs font-semibold" style={{ color: '#f0ede6' }}>
-                              {c.displayName}
-                            </span>
-                            <span className="text-[10px]" style={{ color: '#3d3a35' }}>
-                              {timeAgo(c.createdAt)}
-                            </span>
-                          </div>
-                          <p className="text-xs mt-0.5 leading-relaxed" style={{ color: '#a09d97' }}>
-                            {c.content}
-                          </p>
+                    <Heart
+                      className="w-3.5 h-3.5"
+                      style={{ fill: liked ? '#f43f5e' : 'none', color: liked ? '#f43f5e' : '#57534e' }}
+                    />
+                    <span>{p.likes?.length || 0}</span>
+                  </motion.button>
+
+                  <button
+                    onClick={() => toggleComments(p.id)}
+                    className="flex items-center gap-1.5 text-xs cursor-pointer transition-colors duration-100"
+                    style={{ color: open ? '#4a6cf7' : '#57534e' }}
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" />
+                    <span>{p.commentCount || 0}</span>
+                  </button>
+
+                  <motion.button
+                    onClick={() => toggleSave(p)}
+                    className="flex items-center gap-1.5 text-xs cursor-pointer ml-auto"
+                    style={{ color: saved ? '#4a6cf7' : '#57534e' }}
+                    whileTap={{ scale: 1.2 }}
+                    transition={{ duration: 0.08 }}
+                  >
+                    <Bookmark
+                      className="w-3.5 h-3.5"
+                      style={{ fill: saved ? '#4a6cf7' : 'none', color: saved ? '#4a6cf7' : '#57534e' }}
+                    />
+                    <span>{saved ? 'Saved' : 'Save'}</span>
+                  </motion.button>
+                </div>
+
+                {/* Comments */}
+                <AnimatePresence>
+                  {open && (
+                    <motion.div
+                      className="space-y-2.5 pt-2"
+                      style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                    >
+                      {postComments.length === 0 && (
+                        <p className="text-xs text-center py-1" style={{ color: '#3d3a35' }}>
+                          No comments yet.
+                        </p>
+                      )}
+                      <AnimatePresence initial={false}>
+                        {postComments.map(c => (
+                          <motion.div
+                            key={c.id}
+                            layout
+                            className="flex gap-2"
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -4 }}
+                            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                          >
+                            <Avatar name={c.displayName} color={c.avatarColor} size={24} />
+                            <div
+                              className="flex-1 px-3 py-2 rounded-xl"
+                              style={{
+                                background: 'rgba(255,255,255,0.04)',
+                                border: '1px solid rgba(255,255,255,0.05)',
+                              }}
+                            >
+                              <div className="flex items-baseline gap-1.5">
+                                <span className="text-xs font-semibold" style={{ color: '#f0ede6' }}>
+                                  {c.displayName}
+                                </span>
+                                <span className="text-[10px]" style={{ color: '#3d3a35' }}>
+                                  {timeAgo(c.createdAt)}
+                                </span>
+                              </div>
+                              <p className="text-xs mt-0.5 leading-relaxed" style={{ color: '#a09d97' }}>
+                                {c.content}
+                              </p>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+
+                      {/* Comment input */}
+                      <div className="flex gap-2 pt-0.5">
+                        <Avatar name={me.displayName} color={me.avatarColor} size={24} />
+                        <div className="flex-1 flex gap-1.5">
+                          <input
+                            className="flex-1 text-xs px-3 py-1.5 rounded-xl focus:outline-none"
+                            style={{
+                              background: 'rgba(255,255,255,0.05)',
+                              border: '1px solid rgba(255,255,255,0.07)',
+                              color: '#ccc9c2',
+                            }}
+                            placeholder="Add a comment…"
+                            value={commentInput[p.id] || ''}
+                            onChange={e => setCommentInput(prev => ({ ...prev, [p.id]: e.target.value }))}
+                            onKeyDown={e => e.key === 'Enter' && sendComment(p.id)}
+                          />
+                          <motion.button
+                            onClick={() => sendComment(p.id)}
+                            disabled={!commentInput[p.id]?.trim() || sending[p.id]}
+                            className="w-7 h-7 flex items-center justify-center rounded-lg cursor-pointer disabled:opacity-40"
+                            style={{ background: 'rgba(74,108,247,0.15)', border: '1px solid rgba(74,108,247,0.25)' }}
+                            whileTap={{ scale: 0.9 }}
+                            transition={{ duration: 0.08 }}
+                          >
+                            <Send className="w-3 h-3" style={{ color: '#4a6cf7' }} />
+                          </motion.button>
                         </div>
                       </div>
-                    ))}
-
-                    {/* Comment input */}
-                    <div className="flex gap-2 pt-0.5">
-                      <Avatar name={me.displayName} color={me.avatarColor} size={24} />
-                      <div className="flex-1 flex gap-1.5">
-                        <input
-                          className="flex-1 text-xs px-3 py-1.5 rounded-xl focus:outline-none"
-                          style={{
-                            background: 'rgba(255,255,255,0.05)',
-                            border: '1px solid rgba(255,255,255,0.07)',
-                            color: '#ccc9c2',
-                          }}
-                          placeholder="Add a comment…"
-                          value={commentInput[p.id] || ''}
-                          onChange={e => setCommentInput(prev => ({ ...prev, [p.id]: e.target.value }))}
-                          onKeyDown={e => e.key === 'Enter' && sendComment(p.id)}
-                        />
-                        <motion.button
-                          onClick={() => sendComment(p.id)}
-                          disabled={!commentInput[p.id]?.trim() || sending[p.id]}
-                          className="w-7 h-7 flex items-center justify-center rounded-lg cursor-pointer disabled:opacity-40"
-                          style={{ background: 'rgba(74,108,247,0.15)', border: '1px solid rgba(74,108,247,0.25)' }}
-                          whileTap={{ scale: 0.9 }}
-                          transition={{ duration: 0.08 }}
-                        >
-                          <Send className="w-3 h-3" style={{ color: '#4a6cf7' }} />
-                        </motion.button>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          )
-        })}
-      </motion.div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            )
+          })}
+        </AnimatePresence>
+      </div>
     </div>
   )
 }

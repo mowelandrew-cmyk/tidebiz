@@ -165,17 +165,31 @@ export default function Directory() {
         </div>
 
         {filtered.length === 0 && (
-          <div className="text-center py-12">
-            <div
+          <motion.div
+            className="text-center py-12"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+          >
+            <motion.div
               className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3"
               style={{ background: 'rgba(74,108,247,0.08)', border: '1px solid rgba(74,108,247,0.15)' }}
+              animate={{
+                y: [0, -6, 0],
+                boxShadow: [
+                  '0 0 0 0 rgba(74,108,247,0)',
+                  '0 10px 24px rgba(74,108,247,0.18)',
+                  '0 0 0 0 rgba(74,108,247,0)',
+                ],
+              }}
+              transition={{ duration: 3.4, repeat: Infinity, ease: 'easeInOut' }}
             >
               <Users className="w-5 h-5" style={{ color: '#4a6cf7' }} />
-            </div>
+            </motion.div>
             <p className="text-sm" style={{ color: '#57534e' }}>
               {search ? 'No users match that name.' : 'No other users yet.'}
             </p>
-          </div>
+          </motion.div>
         )}
 
         <motion.div
@@ -275,12 +289,21 @@ export default function Directory() {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.15, duration: 0.3 }}
                 >
-                  <div
+                  <motion.div
                     className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3"
                     style={{ background: 'rgba(74,108,247,0.08)', border: '1px solid rgba(74,108,247,0.15)' }}
+                    animate={{
+                      y: [0, -6, 0],
+                      boxShadow: [
+                        '0 0 0 0 rgba(74,108,247,0)',
+                        '0 10px 24px rgba(74,108,247,0.18)',
+                        '0 0 0 0 rgba(74,108,247,0)',
+                      ],
+                    }}
+                    transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
                   >
                     <MessageSquare className="w-5 h-5" style={{ color: '#4a6cf7' }} />
-                  </div>
+                  </motion.div>
                   <p className="text-sm" style={{ color: '#57534e' }}>
                     Say hello to {dmUser?.displayName}!
                   </p>

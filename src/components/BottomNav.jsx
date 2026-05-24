@@ -1,5 +1,6 @@
+import { useRef, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, useAnimation } from 'framer-motion'
 
 const tabs = [
   { to: '/',           label: 'Home',      icon: HomeIcon },
@@ -21,56 +22,76 @@ export default function BottomNav() {
         boxShadow: '0 -8px 24px rgba(0,0,0,0.4)',
       }}
     >
-      {tabs.map(({ to, label, icon: Icon }) => (
-        <NavLink
-          key={to}
-          to={to}
-          end={to === '/'}
-          className="flex-1"
-        >
+      {tabs.map(({ to, label, icon }) => (
+        <NavLink key={to} to={to} end={to === '/'} className="flex-1">
           {({ isActive }) => (
-            <motion.div
-              className="flex flex-col items-center justify-center py-2 gap-0.5 relative"
-              animate={{ opacity: isActive ? 1 : 0.45 }}
-              transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            >
-              {/* Active pill background */}
-              {isActive && (
-                <motion.div
-                  layoutId="tab-pill"
-                  className="absolute inset-x-1 inset-y-1 rounded-lg"
-                  style={{ background: 'rgba(74,108,247,0.1)' }}
-                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                />
-              )}
-
-              {/* Active indicator dot above icon */}
-              {isActive && (
-                <motion.span
-                  layoutId="tab-dot"
-                  className="absolute top-0 left-1/2 -translate-x-1/2 w-3.5 h-0.5 rounded-full"
-                  style={{ background: 'linear-gradient(90deg, #4a6cf7, #7a93f8)' }}
-                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                />
-              )}
-
-              <div className="relative z-10 flex items-center justify-center w-8 h-6">
-                <Icon
-                  className="w-[17px] h-[17px] transition-colors duration-100"
-                  style={{ color: isActive ? '#4a6cf7' : '#57534e' }}
-                />
-              </div>
-              <span
-                className="relative z-10 text-[9px] font-semibold leading-none tracking-wide"
-                style={{ color: isActive ? '#4a6cf7' : '#57534e' }}
-              >
-                {label}
-              </span>
-            </motion.div>
+            <TabItemInner to={to} label={label} icon={icon} isActive={isActive} />
           )}
         </NavLink>
       ))}
     </nav>
+  )
+}
+
+// ── Animation #5: icon bounce on tab activation ──
+function TabItemInner({ label, icon: Icon, isActive }) {
+  const iconControls = useAnimation()
+  const prevActive = useRef(false)
+
+  useEffect(() => {
+    if (isActive && !prevActive.current) {
+      iconControls.start({
+        scale: [1, 1.35, 0.85, 1.15, 0.95, 1],
+        transition: { duration: 0.48, ease: [0.16, 1, 0.3, 1] },
+      })
+    }
+    prevActive.current = isActive
+  }, [isActive, iconControls])
+
+  return (
+    <motion.div
+      className="flex flex-col items-center justify-center py-2 gap-0.5 relative"
+      animate={{ opacity: isActive ? 1 : 0.45 }}
+      transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {/* Active pill background */}
+      {isActive && (
+        <motion.div
+          layoutId="tab-pill"
+          className="absolute inset-x-1 inset-y-1 rounded-lg"
+          style={{ background: 'rgba(74,108,247,0.1)' }}
+          transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        />
+      )}
+
+      {/* Active indicator dot above icon */}
+      {isActive && (
+        <motion.span
+          layoutId="tab-dot"
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-3.5 h-0.5 rounded-full"
+          style={{ background: 'linear-gradient(90deg, #4a6cf7, #7a93f8)' }}
+          transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        />
+      )}
+
+      {/* Icon with bounce animation */}
+      <motion.div
+        className="relative z-10 flex items-center justify-center w-8 h-6"
+        animate={iconControls}
+      >
+        <Icon
+          className="w-[17px] h-[17px] transition-colors duration-100"
+          style={{ color: isActive ? '#4a6cf7' : '#57534e' }}
+        />
+      </motion.div>
+
+      <span
+        className="relative z-10 text-[9px] font-semibold leading-none tracking-wide"
+        style={{ color: isActive ? '#4a6cf7' : '#57534e' }}
+      >
+        {label}
+      </span>
+    </motion.div>
   )
 }
 

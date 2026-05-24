@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { motion } from 'framer-motion'
 import {
   ResponsiveContainer,
   LineChart, Line,
@@ -49,17 +50,32 @@ export default function Charts({ entries, viewingCurrency, convert, ratesLoading
 
   if (data.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center px-6">
-        <div
+      <motion.div
+        className="flex flex-col items-center justify-center py-20 text-center px-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, delay: 0.1 }}
+      >
+        {/* ── Animation #7: empty state floating icon ── */}
+        <motion.div
           className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3"
           style={{ background: 'rgba(74,108,247,0.08)', border: '1px solid rgba(74,108,247,0.15)' }}
+          animate={{
+            y: [0, -6, 0],
+            boxShadow: [
+              '0 0 0 0 rgba(74,108,247,0)',
+              '0 10px 24px rgba(74,108,247,0.18)',
+              '0 0 0 0 rgba(74,108,247,0)',
+            ],
+          }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="#4a6cf7" strokeWidth={1.8}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
           </svg>
-        </div>
+        </motion.div>
         <p className="text-sm" style={{ color: '#57534e' }}>Add some entries in the Ledger tab to see your charts.</p>
-      </div>
+      </motion.div>
     )
   }
 
@@ -99,13 +115,18 @@ export default function Charts({ entries, viewingCurrency, convert, ratesLoading
         ))}
       </div>
 
-      <div
+      {/* ── Animation #2: chart draws itself on mount ── */}
+      <motion.div
+        key={chartType}
         className="rounded-xl p-4"
         style={{
           background: '#1d1d1a',
           border: '1px solid rgba(255,255,255,0.06)',
           boxShadow: '0 1px 1px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.035)',
         }}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
       >
         <p className="section-label mb-4">
           Revenue · Expenses · Profit — {viewingCurrency}
@@ -118,9 +139,18 @@ export default function Charts({ entries, viewingCurrency, convert, ratesLoading
               <YAxis tickFormatter={v => fmt(v)} tick={{ fill: '#57534e', fontSize: 10 }} width={72} axisLine={false} tickLine={false} />
               <Tooltip formatter={(v, name) => [fmt(v), name]} contentStyle={tooltipStyle} cursor={{ stroke: 'rgba(255,255,255,0.06)' }} />
               <Legend wrapperStyle={{ fontSize: 12, color: '#57534e' }} />
-              <Line type="monotone" dataKey="revenue" stroke="#22c55e" strokeWidth={2} dot={false} name="Revenue" />
-              <Line type="monotone" dataKey="expenses" stroke="#f43f5e" strokeWidth={2} dot={false} name="Expenses" />
-              <Line type="monotone" dataKey="profit" stroke="#4a6cf7" strokeWidth={2} dot={false} name="Profit" />
+              <Line
+                type="monotone" dataKey="revenue" stroke="#22c55e" strokeWidth={2} dot={false} name="Revenue"
+                isAnimationActive animationDuration={1100} animationEasing="ease-out"
+              />
+              <Line
+                type="monotone" dataKey="expenses" stroke="#f43f5e" strokeWidth={2} dot={false} name="Expenses"
+                isAnimationActive animationDuration={1100} animationEasing="ease-out" animationBegin={80}
+              />
+              <Line
+                type="monotone" dataKey="profit" stroke="#4a6cf7" strokeWidth={2} dot={false} name="Profit"
+                isAnimationActive animationDuration={1100} animationEasing="ease-out" animationBegin={160}
+              />
             </LineChart>
           ) : (
             <BarChart {...commonProps}>
@@ -129,13 +159,19 @@ export default function Charts({ entries, viewingCurrency, convert, ratesLoading
               <YAxis tickFormatter={v => fmt(v)} tick={{ fill: '#57534e', fontSize: 10 }} width={72} axisLine={false} tickLine={false} />
               <Tooltip formatter={(v, name) => [fmt(v), name]} contentStyle={tooltipStyle} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
               <Legend wrapperStyle={{ fontSize: 12, color: '#57534e' }} />
-              <Bar dataKey="revenue"  fill="#22c55e" name="Revenue"  radius={[4, 4, 0, 0]} />
-              <Bar dataKey="expenses" fill="#f43f5e" name="Expenses" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="profit"   fill="#4a6cf7" name="Profit"   radius={[4, 4, 0, 0]} />
+              <Bar dataKey="revenue"  fill="#22c55e" name="Revenue"  radius={[4, 4, 0, 0]}
+                isAnimationActive animationDuration={800} animationEasing="ease-out"
+              />
+              <Bar dataKey="expenses" fill="#f43f5e" name="Expenses" radius={[4, 4, 0, 0]}
+                isAnimationActive animationDuration={800} animationEasing="ease-out" animationBegin={60}
+              />
+              <Bar dataKey="profit"   fill="#4a6cf7" name="Profit"   radius={[4, 4, 0, 0]}
+                isAnimationActive animationDuration={800} animationEasing="ease-out" animationBegin={120}
+              />
             </BarChart>
           )}
         </ResponsiveContainer>
-      </div>
+      </motion.div>
     </div>
   )
 }
