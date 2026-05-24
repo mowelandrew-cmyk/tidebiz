@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+    background-color: #111827;
+    color: #f9fafb;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-accent text-gray-900 font-semibold py-3 px-6 rounded-xl
+           hover:bg-accent-dark active:scale-95 transition-all duration-150
+           disabled:opacity-50 disabled:cursor-not-allowed w-full;
+  }
+
+  .btn-secondary {
+    @apply bg-surface-raised text-gray-200 font-medium py-3 px-6 rounded-xl
+           hover:bg-gray-700 active:scale-95 transition-all duration-150 w-full
+           border border-gray-700;
+  }
+
+  .input-field {
+    @apply w-full bg-surface-raised border border-gray-700 rounded-xl px-4 py-3
+           text-gray-100 placeholder-gray-500 focus:outline-none focus:border-accent
+           focus:ring-1 focus:ring-accent transition-colors;
+  }
+
+  .card {
+    @apply bg-surface-card rounded-2xl p-4 border border-gray-800;
+  }
+}
+
+.journal-editor[data-placeholder]:empty:before {
+  content: attr(data-placeholder);
+  color: #6b7280;
+  pointer-events: none;
+}
+
+.entry-content b,
+.entry-content strong { font-weight: 700; }
+.entry-content i,
+.entry-content em { font-style: italic; }
+.entry-content u { text-decoration: underline; }
+.entry-content s,
+.entry-content strike { text-decoration: line-through; }

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\mowel\\\\Downloads\\\\TideBiz\" -ErrorAction SilentlyContinue; if \\(-not \\(Test-Path \"C:\\\\Users\\\\mowel\\\\Downloads\\\\TideBiz\"\\)\\) { Write-Host \"Directory does not exist\" })",
+      "mcp__Claude_Preview__preview_start"
+    ]
+  }
+}
