@@ -34,10 +34,13 @@ const FONT_SIZES = [
 ]
 
 export default function Settings() {
-  const { user, userProfile, logOut, updateDisplayName, updateAvatarColor, deleteAccount } = useAuth()
+  const { user, userProfile, logOut, updateDisplayName, updateAvatarColor, updateBio, deleteAccount } = useAuth()
   const [nameInput, setNameInput] = useState(userProfile?.displayName ?? user?.displayName ?? '')
   const [nameSaving, setNameSaving] = useState(false)
   const [nameSuccess, setNameSuccess] = useState(false)
+  const [bioInput, setBioInput] = useState(userProfile?.bio ?? '')
+  const [bioSaving, setBioSaving] = useState(false)
+  const [bioSuccess, setBioSuccess] = useState(false)
   const [fontSize, setFontSize] = useState(localStorage.getItem('tidebiz_fontsize') ?? 'medium')
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -64,6 +67,19 @@ export default function Settings() {
     setFontSize(size)
     localStorage.setItem('tidebiz_fontsize', size)
     document.documentElement.dataset.fontsize = size
+  }
+
+  async function handleSaveBio() {
+    const trimmed = bioInput.trim()
+    if (trimmed === (userProfile?.bio ?? '')) return
+    setBioSaving(true)
+    try {
+      await updateBio(trimmed)
+      setBioSuccess(true)
+      setTimeout(() => setBioSuccess(false), 2000)
+    } finally {
+      setBioSaving(false)
+    }
   }
 
   async function handleDeleteAccount() {
@@ -126,6 +142,28 @@ export default function Settings() {
               className="px-4 py-2 rounded-xl bg-accent text-gray-900 text-sm font-semibold disabled:opacity-40 shrink-0"
             >
               {nameSuccess ? '✓' : nameSaving ? '…' : 'Save'}
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-xs text-gray-400">Bio</label>
+          <textarea
+            className="input-field text-sm resize-none"
+            value={bioInput}
+            onChange={e => setBioInput(e.target.value)}
+            placeholder="Tell the community about you and your business"
+            rows={3}
+            maxLength={150}
+          />
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-gray-600">{bioInput.length}/150</span>
+            <button
+              onClick={handleSaveBio}
+              disabled={bioSaving || bioInput.trim() === (userProfile?.bio ?? '')}
+              className="px-4 py-1.5 rounded-xl bg-accent text-gray-900 text-sm font-semibold disabled:opacity-40"
+            >
+              {bioSuccess ? '✓' : bioSaving ? '…' : 'Save'}
             </button>
           </div>
         </div>

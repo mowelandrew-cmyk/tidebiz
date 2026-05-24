@@ -87,6 +87,26 @@ export function AuthProvider({ children }) {
     setUserProfile(prev => ({ ...prev, avatarColor: color }))
   }
 
+  async function updateBio(bio) {
+    if (!user) return
+    await updateDoc(doc(db, 'users', user.uid), { bio })
+    setUserProfile(prev => ({ ...prev, bio }))
+  }
+
+  async function completeOnboarding(data) {
+    if (!user) return
+    const { displayName, ...rest } = data
+    await Promise.allSettled([
+      updateProfile(user, { displayName }),
+      setDoc(doc(db, 'users', user.uid), {
+        displayName,
+        ...rest,
+        onboardingComplete: true,
+      }, { merge: true }),
+    ])
+    setUserProfile(prev => ({ ...prev, displayName, ...rest, onboardingComplete: true }))
+  }
+
   async function deleteAccount() {
     if (!user) return
     const uid = user.uid
@@ -103,7 +123,7 @@ export function AuthProvider({ children }) {
     <AuthContext.Provider value={{
       user, userProfile, loading,
       signUp, logIn, logInWithGoogle, logOut,
-      updateDisplayName, updateAvatarColor, deleteAccount,
+      updateDisplayName, updateAvatarColor, updateBio, completeOnboarding, deleteAccount,
     }}>
       {children}
     </AuthContext.Provider>

@@ -1,10 +1,11 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
-import { AuthProvider } from './context/AuthContext'
+import { AuthProvider, useAuth } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import BottomNav from './components/BottomNav'
 
 import Login from './pages/auth/Login'
 import Signup from './pages/auth/Signup'
+import Onboarding from './pages/Onboarding'
 import Home from './pages/Home'
 import Logs from './pages/Logs'
 import Journal from './pages/Journal'
@@ -20,7 +21,13 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* Protected app shell */}
+        {/* Onboarding — protected but no nav shell */}
+        <Route
+          path="/onboarding"
+          element={<ProtectedRoute><Onboarding /></ProtectedRoute>}
+        />
+
+        {/* Main app shell */}
         <Route
           path="/*"
           element={
@@ -35,8 +42,14 @@ export default function App() {
 }
 
 function AppShell() {
+  const { userProfile } = useAuth()
   const { pathname } = useLocation()
   const isChat = pathname === '/chat'
+
+  // Send new / un-onboarded users through onboarding first
+  if (!userProfile?.onboardingComplete) {
+    return <Navigate to="/onboarding" replace />
+  }
 
   return (
     <div className="flex flex-col h-screen bg-surface overflow-hidden">
