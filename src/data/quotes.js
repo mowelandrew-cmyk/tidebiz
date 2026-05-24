@@ -1,0 +1,90 @@
+// Curated daily quotes from entrepreneurs and business leaders.
+// Rotates by day-of-year so every user sees the same quote each day.
+
+export const QUOTES = [
+  { text: "Your time is limited, so don't waste it living someone else's life.", author: "Steve Jobs", title: "Co-founder, Apple" },
+  { text: "The biggest risk is not taking any risk. In a world that's changing really quickly, the only strategy that is guaranteed to fail is not taking risks.", author: "Mark Zuckerberg", title: "Co-founder, Meta" },
+  { text: "I knew that if I failed I wouldn't regret that, but I knew the one thing I might regret is not trying.", author: "Jeff Bezos", title: "Founder, Amazon" },
+  { text: "The only way to do great work is to love what you do.", author: "Steve Jobs", title: "Co-founder, Apple" },
+  { text: "Don't be afraid to give up the good to go for the great.", author: "John D. Rockefeller", title: "Founder, Standard Oil" },
+  { text: "Ideas are easy. Execution is everything.", author: "John Doerr", title: "Partner, Kleiner Perkins" },
+  { text: "Chase the vision, not the money. The money will end up following you.", author: "Tony Hsieh", title: "CEO, Zappos" },
+  { text: "If you are not embarrassed by the first version of your product, you've launched too late.", author: "Reid Hoffman", title: "Co-founder, LinkedIn" },
+  { text: "I never dreamed about success. I worked for it.", author: "Estée Lauder", title: "Founder, Estée Lauder Companies" },
+  { text: "Risk more than others think is safe. Dream more than others think is practical.", author: "Howard Schultz", title: "Former CEO, Starbucks" },
+  { text: "The way to get started is to quit talking and begin doing.", author: "Walt Disney", title: "Co-founder, The Walt Disney Company" },
+  { text: "An entrepreneur is someone who will jump off a cliff and assemble an airplane on the way down.", author: "Reid Hoffman", title: "Co-founder, LinkedIn" },
+  { text: "It's not about ideas. It's about making ideas happen.", author: "Scott Belsky", title: "Co-founder, Behance" },
+  { text: "Success usually comes to those who are too busy to be looking for it.", author: "Henry David Thoreau", title: "Author & Philosopher" },
+  { text: "The secret of getting ahead is getting started.", author: "Mark Twain", title: "Author" },
+  { text: "I find that the harder I work, the more luck I seem to have.", author: "Thomas Jefferson", title: "Founding Father & Entrepreneur" },
+  { text: "Don't let the fear of losing be greater than the excitement of winning.", author: "Robert Kiyosaki", title: "Author, Rich Dad Poor Dad" },
+  { text: "The function of leadership is to produce more leaders, not more followers.", author: "Ralph Nader", title: "Political Activist & Author" },
+  { text: "Entrepreneurship is living a few years of your life like most people won't, so you can spend the rest of your life like most people can't.", author: "Anonymous" , title: "Entrepreneur wisdom" },
+  { text: "Move fast and break things. Unless you are breaking stuff, you are not moving fast enough.", author: "Mark Zuckerberg", title: "Co-founder, Meta" },
+  { text: "If you don't build your dream, someone else will hire you to build theirs.", author: "Tony Gaskins", title: "Author & Motivational Speaker" },
+  { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb", title: "Ancient wisdom" },
+  { text: "Opportunities don't happen. You create them.", author: "Chris Grosser", title: "Entrepreneur & Photographer" },
+  { text: "Whether you think you can or you think you can't, you're right.", author: "Henry Ford", title: "Founder, Ford Motor Company" },
+  { text: "The only limit to our realization of tomorrow will be our doubts of today.", author: "Franklin D. Roosevelt", title: "32nd President of the United States" },
+  { text: "Revenue is vanity, profit is sanity, cash is reality.", author: "Anonymous", title: "Business wisdom" },
+  { text: "Your most unhappy customers are your greatest source of learning.", author: "Bill Gates", title: "Co-founder, Microsoft" },
+  { text: "Make every detail perfect and limit the number of details to perfect.", author: "Jack Dorsey", title: "Co-founder, Twitter & Square" },
+  { text: "The people who are crazy enough to think they can change the world are the ones who do.", author: "Steve Jobs", title: "Co-founder, Apple" },
+  { text: "Never let the fear of striking out keep you from playing the game.", author: "Babe Ruth", title: "Baseball Legend & Icon" },
+  { text: "I have not failed. I've just found 10,000 ways that won't work.", author: "Thomas Edison", title: "Inventor & Entrepreneur" },
+  { text: "Formal education will make you a living. Self-education will make you a fortune.", author: "Jim Rohn", title: "Entrepreneur & Author" },
+  { text: "Failure is simply the opportunity to begin again, this time more intelligently.", author: "Henry Ford", title: "Founder, Ford Motor Company" },
+  { text: "You miss 100% of the shots you don't take.", author: "Wayne Gretzky", title: "Hockey Legend" },
+  { text: "The harder the conflict, the more glorious the triumph.", author: "Thomas Paine", title: "Political Activist" },
+  { text: "Build something 100 people love, not something 1 million people kind of like.", author: "Brian Chesky", title: "Co-founder, Airbnb" },
+  { text: "If you really look closely, most overnight successes took a long time.", author: "Steve Jobs", title: "Co-founder, Apple" },
+  { text: "The value of an idea lies in the using of it.", author: "Thomas Edison", title: "Inventor & Entrepreneur" },
+  { text: "Genius is 1% inspiration and 99% perspiration.", author: "Thomas Edison", title: "Inventor & Entrepreneur" },
+  { text: "Your reputation is more important than your paycheck, and your integrity is worth more than your career.", author: "Ryan Freitas", title: "Designer & Entrepreneur" },
+  { text: "Scared money don't make money.", author: "Jay-Z", title: "Entrepreneur & Artist" },
+  { text: "In the middle of every difficulty lies opportunity.", author: "Albert Einstein", title: "Theoretical Physicist" },
+  { text: "The successful warrior is the average man, with laser-like focus.", author: "Bruce Lee", title: "Martial Artist & Philosopher" },
+  { text: "Do one thing every day that scares you.", author: "Eleanor Roosevelt", title: "Former First Lady & Activist" },
+  { text: "The customer is always right, but which customer?", author: "Seth Godin", title: "Author & Marketing Expert" },
+  { text: "Think big and don't listen to people who tell you it can't be done. Life's too short to think small.", author: "Tim Ferriss", title: "Author & Entrepreneur" },
+  { text: "A brand is no longer what we tell the consumer it is — it is what consumers tell each other it is.", author: "Scott Cook", title: "Co-founder, Intuit" },
+  { text: "Price is what you pay. Value is what you get.", author: "Warren Buffett", title: "CEO, Berkshire Hathaway" },
+  { text: "The best marketing doesn't feel like marketing.", author: "Tom Fishburne", title: "Founder, Marketoonist" },
+  { text: "Without continual growth and progress, such words as improvement, achievement, and success have no meaning.", author: "Benjamin Franklin", title: "Founding Father & Entrepreneur" },
+  { text: "Don't find customers for your products, find products for your customers.", author: "Seth Godin", title: "Author & Marketing Expert" },
+  { text: "A startup is a company designed to grow fast.", author: "Paul Graham", title: "Co-founder, Y Combinator" },
+  { text: "The only way to win is to learn faster than anyone else.", author: "Eric Ries", title: "Author, The Lean Startup" },
+  { text: "Simplicity is the ultimate sophistication.", author: "Leonardo da Vinci", title: "Artist & Inventor" },
+  { text: "Design is not just what it looks like and feels like. Design is how it works.", author: "Steve Jobs", title: "Co-founder, Apple" },
+  { text: "Good things come to those who hustle.", author: "Anaïs Nin", title: "Author" },
+  { text: "The secret to successful hiring is this: look for the people who want to change the world.", author: "Marc Benioff", title: "CEO, Salesforce" },
+  { text: "Your work is going to fill a large part of your life, and the only way to be truly satisfied is to do what you believe is great work.", author: "Steve Jobs", title: "Co-founder, Apple" },
+  { text: "If you're not growing, you're dying.", author: "Tony Robbins", title: "Author & Life Coach" },
+  { text: "Capital is not scarce. Vision is.", author: "Sam Walton", title: "Founder, Walmart" },
+  { text: "You don't learn to walk by following rules. You learn by doing and by falling over.", author: "Richard Branson", title: "Founder, Virgin Group" },
+  { text: "Don't be pushed around by the fears in your mind. Be led by the dreams in your heart.", author: "Roy T. Bennett", title: "Author" },
+  { text: "I'm convinced that about half of what separates successful entrepreneurs from the non-successful ones is pure perseverance.", author: "Steve Jobs", title: "Co-founder, Apple" },
+  { text: "A person who never made a mistake never tried anything new.", author: "Albert Einstein", title: "Theoretical Physicist" },
+  { text: "Work like someone is working 24 hours a day to take it all away from you.", author: "Mark Cuban", title: "Owner, Dallas Mavericks & Entrepreneur" },
+  { text: "Whatever the mind of man can conceive and believe, it can achieve.", author: "Napoleon Hill", title: "Author, Think and Grow Rich" },
+  { text: "Take up one idea. Make that one idea your life.", author: "Swami Vivekananda", title: "Philosopher & Monk" },
+  { text: "You can't connect the dots looking forward; you can only connect them looking backwards.", author: "Steve Jobs", title: "Co-founder, Apple" },
+  { text: "The entrepreneur always searches for change, responds to it, and exploits it as an opportunity.", author: "Peter Drucker", title: "Management Consultant & Author" },
+  { text: "Great companies are built on great products.", author: "Elon Musk", title: "CEO, Tesla & SpaceX" },
+  { text: "If everything seems under control, you're not going fast enough.", author: "Mario Andretti", title: "Racing Champion" },
+  { text: "Go as far as you can see; when you get there, you'll be able to see further.", author: "J.P. Morgan", title: "Founder, JPMorgan" },
+  { text: "Diligence is the mother of good luck.", author: "Benjamin Franklin", title: "Founding Father & Entrepreneur" },
+]
+
+/**
+ * Returns the quote for today. Consistent for all users on the same calendar day.
+ */
+export function getDailyQuote() {
+  const now = new Date()
+  const start = new Date(now.getFullYear(), 0, 0)
+  const diff = now - start
+  const oneDay = 1000 * 60 * 60 * 24
+  const dayOfYear = Math.floor(diff / oneDay)
+  return QUOTES[dayOfYear % QUOTES.length]
+}

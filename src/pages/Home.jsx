@@ -2,8 +2,9 @@ import { useAuth } from '../context/AuthContext'
 import { useReminders } from '../hooks/useReminders'
 import { useNavigate } from 'react-router-dom'
 import {
-  TrendingUp, BookOpen, Sparkles, Bell, ChevronRight, Zap,
+  TrendingUp, BookOpen, Sparkles, Bell, ChevronRight, Zap, Quote,
 } from 'lucide-react'
+import { getDailyQuote } from '../data/quotes'
 
 function todayKey() {
   const d = new Date()
@@ -36,6 +37,7 @@ export default function Home() {
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
   const plan = userProfile?.plan ?? 'free'
+  const quote = getDailyQuote()
 
   return (
     <div className="px-4 pt-6 pb-6 space-y-6">
@@ -107,6 +109,21 @@ export default function Home() {
               </p>
             </button>
           ))}
+        </div>
+      </div>
+
+      {/* ── Daily quote ── */}
+      <div style={CARD} className="rounded-2xl px-4 py-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Quote className="w-3.5 h-3.5 shrink-0" style={{ color: '#4a6cf7' }} />
+          <p className="text-xs font-medium text-gray-500">Daily quote</p>
+        </div>
+        <p className="text-sm leading-relaxed" style={{ color: '#d6d3ce', fontStyle: 'italic' }}>
+          "{quote.text}"
+        </p>
+        <div>
+          <p className="text-xs font-semibold" style={{ color: '#f0ede6' }}>{quote.author}</p>
+          <p className="text-[11px] text-gray-500 mt-0.5">{quote.title}</p>
         </div>
       </div>
 
