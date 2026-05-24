@@ -3,7 +3,6 @@ import Stripe from 'stripe'
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 const FIRESTORE_BASE = `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents`
-const APP_URL = process.env.APP_URL || 'https://tidebiz.vercel.app'
 
 async function verifyToken(idToken) {
   const res = await fetch(
@@ -50,7 +49,7 @@ export default async function handler(req, res) {
 
     const session = await stripe.billingPortal.sessions.create({
       customer: userDoc.stripeCustomerId,
-      return_url: `${APP_URL}/settings`,
+      return_url: `https://${req.headers.host}/settings`,
     })
 
     return res.json({ url: session.url })

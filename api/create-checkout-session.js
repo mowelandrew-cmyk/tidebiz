@@ -3,7 +3,6 @@ import Stripe from 'stripe'
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 const FIRESTORE_BASE = `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents`
-const APP_URL = process.env.APP_URL || 'https://tidebiz.vercel.app'
 
 const PRICE_IDS = {
   pro: process.env.STRIPE_PRO_PRICE_ID,
@@ -58,8 +57,8 @@ export default async function handler(req, res) {
       line_items: [{ price: priceId, quantity: 1 }],
       metadata: { uid, plan },
       subscription_data: { metadata: { uid, plan } },
-      success_url: `${APP_URL}/settings?payment=success`,
-      cancel_url: `${APP_URL}/settings`,
+      success_url: `https://${req.headers.host}/settings?payment=success`,
+      cancel_url: `https://${req.headers.host}/settings`,
       allow_promotion_codes: true,
     }
 
