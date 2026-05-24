@@ -218,6 +218,21 @@ export default function Settings() {
 
       {/* Subscription */}
       <Section title="Subscription">
+        {/* Payment failed banner */}
+        {userProfile?.paymentFailed && plan === 'free' && (
+          <div className="px-4 py-3 bg-rose-600/20 border border-rose-600/40 rounded-xl">
+            <p className="text-sm text-rose-400 font-medium">⚠️ Your last payment failed — you've been moved to Free.</p>
+            <p className="text-xs text-rose-400/70 mt-0.5">Update your payment method to reactivate your plan.</p>
+            <button
+              onClick={handleManageSubscription}
+              disabled={!!upgrading}
+              className="mt-2 text-xs font-semibold text-rose-400 underline disabled:opacity-50"
+            >
+              {upgrading === 'manage' ? 'Opening…' : 'Fix payment method →'}
+            </button>
+          </div>
+        )}
+
         {/* Payment success banner */}
         {paymentSuccess && (
           <div className="px-4 py-3 bg-green-600/20 border border-green-600/40 rounded-xl">

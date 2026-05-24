@@ -60,6 +60,7 @@ export default async function handler(req, res) {
             plan,
             stripeCustomerId: customerId,
             stripeSubscriptionId: subscriptionId || null,
+            paymentFailed: false,
           })
           console.log(`Plan updated: user ${uid} → ${plan}`)
         }
@@ -84,6 +85,22 @@ export default async function handler(req, res) {
             await snap.docs[0].ref.update({ plan })
             console.log(`Plan updated via portal: customer ${customerId} → ${plan}`)
           }
+        }
+        break
+      }
+
+      // Payment failed → downgrade to free until they fix their card
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object
+        const customerId = invoice.customer
+
+        const snap = await adminDb.collection('users')
+          .where('stripeCustomerId', '==', customerId)
+          .limit(1)
+          .get()
+        if (!snap.empty) {
+          await snap.docs[0].ref.update({ plan: 'free', paymentFailed: true })
+          console.log(`Payment failed: downgraded customer ${customerId} to free`)
         }
         break
       }
