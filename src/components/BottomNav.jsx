@@ -11,21 +11,42 @@ const tabs = [
 
 export default function BottomNav() {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-surface-raised border-t border-gray-800
-                    flex items-stretch safe-area-pb"
-         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-50 flex items-stretch"
+      style={{
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        background: 'linear-gradient(180deg, #131825 0%, #0f1117 100%)',
+        borderTop: '1px solid rgba(255,255,255,0.06)',
+      }}
+    >
       {tabs.map(({ to, label, icon: Icon }) => (
         <NavLink
           key={to}
           to={to}
           end={to === '/'}
-          className={({ isActive }) =>
-            `flex-1 flex flex-col items-center justify-center py-2 gap-0.5 transition-colors duration-150
-             ${isActive ? 'text-accent' : 'text-gray-500 hover:text-gray-300'}`
-          }
+          className="flex-1"
         >
-          <Icon className="w-5 h-5" />
-          <span className="text-[10px] font-medium leading-none">{label}</span>
+          {({ isActive }) => (
+            <div className={`flex flex-col items-center justify-center py-2 gap-0.5 transition-colors duration-200 ${isActive ? 'text-accent' : 'text-gray-600 hover:text-gray-400'}`}>
+              <div
+                className="relative flex items-center justify-center w-9 h-7 rounded-lg transition-all duration-200"
+                style={isActive ? {
+                  background: 'rgba(74, 108, 247, 0.12)',
+                } : {}}
+              >
+                {isActive && (
+                  <span
+                    className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
+                    style={{ background: 'linear-gradient(90deg, #4a6cf7, #7a93f8)' }}
+                  />
+                )}
+                <Icon className="w-[18px] h-[18px]" />
+              </div>
+              <span className={`text-[9px] font-semibold leading-none tracking-wide uppercase transition-colors ${isActive ? 'text-accent' : 'text-gray-600'}`}>
+                {label}
+              </span>
+            </div>
+          )}
         </NavLink>
       ))}
     </nav>

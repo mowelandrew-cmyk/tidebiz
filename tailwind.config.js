@@ -8,18 +8,19 @@ export default {
     extend: {
       colors: {
         accent: {
-          DEFAULT: '#38bdf8',
-          dark: '#0ea5e9',
-          light: '#7dd3fc',
+          DEFAULT: '#4a6cf7',
+          dark: '#3655e5',
+          light: '#7a93f8',
         },
         surface: {
-          DEFAULT: '#111827',
-          raised: '#1f2937',
-          card: '#1a2332',
+          DEFAULT: '#0f1117',
+          raised: '#161b28',
+          card: '#131825',
         },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['"Space Grotesk"', 'Inter', 'system-ui', 'sans-serif'],
       },
     },
   },
